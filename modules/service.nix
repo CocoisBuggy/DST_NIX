@@ -79,7 +79,6 @@ let
 
         preStart = ''
           mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
-          chmod +x ${entrypoint}        
           chown -R ${cfg.userName}:${cfg.groupName} ${instanceBaseDir}
         '';
 
