@@ -86,6 +86,7 @@ let
           ExecStart = "${entrypoint}";
           User = "dstserver";
           Group = "dstserver";
+          ExecStartPre = "mkdir -p ${instanceBaseDir}";
           WorkingDirectory = instanceBaseDir;
           Restart = "on-failure";
         };
