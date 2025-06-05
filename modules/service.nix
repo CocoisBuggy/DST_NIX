@@ -77,6 +77,7 @@ let
         wantedBy = [ "multi-user.target" ];
 
         preStart = ''
+          echo "will do pre-start"
           mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
           chmod +x ${entrypoint}        
           chown -R ${cfg.userName}:${cfg.groupName} ${instanceBaseDir}
@@ -86,7 +87,6 @@ let
           ExecStart = "${entrypoint}";
           User = "dstserver";
           Group = "dstserver";
-          ExecStartPre = "mkdir -p ${instanceBaseDir}";
           WorkingDirectory = instanceBaseDir;
           Restart = "on-failure";
         };
