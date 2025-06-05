@@ -22,13 +22,13 @@ let
   makeInstanceService =
     instance:
     let
-      instanceBaseDir = "${homeDir}/${instance.name}";
-      inherit (instance) clusterName;
+      cluster_name = instance.cluster.NETWORK.cluster_name;
+      instanceBaseDir = "${homeDir}/${cluster_name}";
       inherit (cfg) installDir;
 
       entrypoint = writeShellScript "entrypoint.sh" ''
         install_dir="${cfg.installDir}"
-        cluster_name="${clusterName}"
+        cluster_name="${cluster_name}"
         dontstarve_dir="${homeDir}"
 
         function fail()
@@ -65,8 +65,8 @@ let
       '';
     in
     {
-      "systemd.services.dst-server@${instance.name}" = {
-        description = "DST Server instance ${instance.name}";
+      "systemd.services.dst-server@${cluster_name}" = {
+        description = "DST Server instance ${cluster_name}";
 
         # we have a single update service that keeps us up to date from the steam
         # cmd control server, so we can wait for it to finish installing and
@@ -191,6 +191,6 @@ in
     systemd.services = lib.foldlAttrs (
       acc: instanceName: instCfg:
       acc // makeInstanceService instCfg
-    ) { } (lib.listToAttrs (map (i: nameValuePair i.name i) cfg.instances));
+    ) { } (lib.listToAttrs (map (i: nameValuePair i.cluster.NETWORK.cluster_name i) cfg.instances));
   };
 }
