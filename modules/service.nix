@@ -78,7 +78,7 @@ let
         wantedBy = [ "multi-user.target" ];
 
         preStart = ''
-          mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
+          ${pkgs.uutils-coreutils-noprefix}/bin/mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
           chown -R ${cfg.userName}:${cfg.groupName} ${instanceBaseDir}
         '';
 
@@ -86,7 +86,6 @@ let
           ExecStart = "${entrypoint}";
           User = "dstserver";
           Group = "dstserver";
-          ExecStartPre = "mkdir -p ${instanceBaseDir}";
           WorkingDirectory = instanceBaseDir;
           Restart = "on-failure";
         };
