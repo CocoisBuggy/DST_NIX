@@ -99,7 +99,7 @@ in
 {
   imports = [ ./update.nix ];
 
-  options.services.dst-server = {
+  options.services.dstserver = {
     instances = mkOption {
       type = types.listOf (
         types.submodule {
