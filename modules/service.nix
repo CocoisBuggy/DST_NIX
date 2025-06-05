@@ -7,8 +7,6 @@
 
 let
   cfg = config.services.dstserver;
-  user = "dstserver";
-  homeDir = "/var/lib/${user}";
 
   inherit (pkgs) writeShellScript;
   inherit (lib)
@@ -23,13 +21,13 @@ let
     instance:
     let
       cluster_name = instance.cluster.NETWORK.cluster_name;
-      instanceBaseDir = "${homeDir}/${cluster_name}";
+      instanceBaseDir = "${cfg.dataDir}/${cluster_name}";
       inherit (cfg) installDir;
 
       entrypoint = writeShellScript "entrypoint.sh" ''
         install_dir="${cfg.installDir}"
         cluster_name="${cluster_name}"
-        dontstarve_dir="${homeDir}"
+        dontstarve_dir="${cfg.dataDir}"
 
         function fail()
         {
@@ -65,7 +63,7 @@ let
       '';
     in
     {
-      "systemd.services.dst-server@${cluster_name}" = {
+      "dst-server@${cluster_name}" = {
         description = "DST Server instance ${cluster_name}";
 
         # we have a single update service that keeps us up to date from the steam
@@ -80,8 +78,7 @@ let
 
         preStart = ''
           mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
-
-          chmod +x ${entrypoint}
+          chmod +x ${entrypoint}        
           chown -R ${cfg.userName}:${cfg.groupName} ${instanceBaseDir}
         '';
 
