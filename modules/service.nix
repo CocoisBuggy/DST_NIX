@@ -63,6 +63,7 @@ let
       '';
     in
     {
+
       "dst-server@${cluster_name}" = {
         description = "DST Server instance ${cluster_name}";
 
@@ -77,7 +78,6 @@ let
         wantedBy = [ "multi-user.target" ];
 
         preStart = ''
-          echo "will do pre-start"
           mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
           chmod +x ${entrypoint}        
           chown -R ${cfg.userName}:${cfg.groupName} ${instanceBaseDir}
@@ -87,6 +87,7 @@ let
           ExecStart = "${entrypoint}";
           User = "dstserver";
           Group = "dstserver";
+          ExecStartPre = "mkdir -p ${instanceBaseDir}";
           WorkingDirectory = instanceBaseDir;
           Restart = "on-failure";
         };
@@ -185,6 +186,11 @@ in
       createHome = true;
     };
     users.groups.${cfg.groupName} = { };
+
+    systemd.tmpfiles.rules = map (
+      x:
+      "d '${cfg.dataDir}/${x.cluster.NETWORK.cluster_name}' 0750 '${cfg.userName}' '${cfg.groupName}' -"
+    ) cfg.instances;
 
     systemd.services = lib.foldlAttrs (
       acc: instanceName: instCfg:
