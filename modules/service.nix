@@ -97,87 +97,8 @@ in
   imports = [
     ./update.nix
     ./config.nix
+    ./options.nix
   ];
-
-  options.services.dstserver = {
-    instances = mkOption {
-      type = types.listOf (
-        types.submodule {
-          options = {
-            # Configurations for the CAVE shard
-            caves = {
-              server = {
-                NETWORK = {
-                  server_port = 11001;
-                };
-                SHARD = {
-                  is_master = false;
-                  name = "Caves";
-                };
-                STEAM = {
-                  master_server_port = 27019;
-                  authentication_port = 8769;
-                };
-              };
-            };
-
-            # Configurations for the master shard (Overworld, typically)
-            master = {
-              server = {
-                NETWORK = {
-                  server_port = 11000;
-                };
-                SHARD = {
-                  is_master = true;
-                  name = "Caves";
-                };
-                STEAM = {
-                  master_server_port = 27018;
-                  authentication_port = 8768;
-                };
-              };
-            };
-
-            # Configurations for the cluster itself, since it
-            # will be coordinating and overseeing our shards.
-            cluster = {
-              GAMEPLAY = {
-                game_mode = "survival";
-                max_players = 12;
-                pvp = false;
-                pause_when_empty = true;
-              };
-
-              NETWORK = {
-                cluster_description = "We be starving out here";
-                cluster_name = mkOption {
-                  type = types.str;
-                  description = ''
-                    some cluster name for the server.
-                  '';
-                };
-                cluster_password = "yippee";
-              };
-
-              MISC = {
-                console_enabled = true;
-              };
-
-              SHARD = {
-                shard_enabled = true;
-                bind_ip = "127.0.0.1";
-                master_ip = "127.0.0.1";
-                master_port = 10889;
-                cluster_key = "supersecretkey";
-              };
-            };
-          };
-        }
-      );
-      default = [ ];
-      description = "List of DST service instances";
-    };
-  };
 
   config = mkIf (cfg.instances != [ ]) {
     users.users.${cfg.userName} = {
