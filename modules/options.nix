@@ -2,6 +2,53 @@
 
 with lib;
 
+let
+  shardOptions = preset: {
+    ini = {
+      NETWORK = {
+        server_port = mkOption {
+          type = types.int;
+          default = 11000;
+          description = "Each shard has its own port binding";
+        };
+      };
+      SHARD = {
+        is_master = mkOption {
+          type = types.bool;
+          default = (preset == "SURVIVAL_TOGETHER");
+          description = "Which shard should the cluster treat as the primary one?";
+        };
+      };
+      STEAM = {
+        master_server_port = mkOption {
+          type = types.int;
+          default = 27018;
+          description = "Slightly mystical to me, except that each shard increments by 1";
+        };
+        authentication_port = mkOption {
+          type = types.int;
+          default = 8768;
+          description = "Slightly mystical to me, except that each shard increments by 1";
+        };
+      };
+    };
+    lua = {
+      override_enabled = mkOption {
+        type = types.bool;
+        default = true;
+      };
+      preset = mkOption {
+        type = types.str;
+        default = preset;
+        description = "SURVIVAL_TOGETHER, DST_CAVE";
+      };
+      overrides = mkOption {
+        type = types.attrset;
+        default = { };
+      };
+    };
+  };
+in
 {
   options.services.dstserver.instances = mkOption {
     type = types.listOf (
@@ -97,6 +144,9 @@ with lib;
                 };
               };
             };
+
+            master = shardOptions "SURVIVAL_TOGETHER";
+            caves = shardOptions "DST_CAVE";
           };
         }
       )
