@@ -35,10 +35,10 @@ in
 
       # The lua override is a bit more of a trick.
       ++ (map (
-        instance: file instance "Master/worldgenoverride.lua" (luaGen instance.master.lua)
+        instance: file instance "Master/worldgenoverride.lua" (luaGen.renderLuaFile instance.master.lua)
       ) cfg.instances)
       ++ (map (
-        instance: file instance "Caves/worldgenoverride.lua" (luaGen instance.caves.lua)
+        instance: file instance "Caves/worldgenoverride.lua" (luaGen.renderLuaFile instance.caves.lua)
       ) cfg.instances);
   };
 }
