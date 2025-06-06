@@ -47,7 +47,7 @@ let
 
         cd "${installDir}/bin64" || fail
 
-        run_shared=(${pkgs.steam-run}/bin/steam-run -- ./dontstarve_dedicated_server_nullrenderer_x64)
+        run_shared=(./dontstarve_dedicated_server_nullrenderer_x64)
         run_shared+=(-console)
         run_shared+=(-cluster "${cluster_name}")
         run_shared+=(-monitor_parent_process \$\$)
@@ -78,7 +78,7 @@ let
         '';
 
         serviceConfig = {
-          ExecStart = "${entrypoint}";
+          ExecStart = "${pkgs.steam-run}/bin/steam-run ${entrypoint}";
           User = "dstserver";
           Group = "dstserver";
           WorkingDirectory = instanceBaseDir;
@@ -102,10 +102,6 @@ in
       home = cfg.dataDir;
       createHome = true;
     };
-
-    environment.systemPackages = [
-      pkgs.pkgsi686Linux.curlWithGnuTls
-    ];
 
     users.groups.${cfg.groupName} = { };
 
