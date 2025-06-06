@@ -102,6 +102,11 @@ in
       home = cfg.dataDir;
       createHome = true;
     };
+
+    environment.systemPackages = with pkgs; [
+      curlWithGnuTls
+    ];
+
     users.groups.${cfg.groupName} = { };
 
     systemd.tmpfiles.rules = map (
