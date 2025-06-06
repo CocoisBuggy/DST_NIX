@@ -15,6 +15,11 @@ with lib;
               description = "Name of the DST server instance.";
             };
 
+            cluster_token = mkOption {
+              type = types.str;
+              description = "A required secret token that the cluster uses to talk to the klei server";
+            };
+
             cluster = {
               GAMEPLAY = {
                 game_mode = mkOption {
