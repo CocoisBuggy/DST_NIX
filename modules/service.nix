@@ -24,11 +24,7 @@ let
       inherit (cfg) installDir;
 
       entrypoint = writeShellScript "entrypoint.sh" ''
-        install_dir="${cfg.installDir}"
-        cluster_name="${cluster_name}"
-        dontstarve_dir="${cfg.dataDir}"
-
-        function fail()
+         function fail()
         {
         	echo Error: "$@" >&2
         	exit 1
@@ -46,19 +42,18 @@ let
         check_for_file "${instanceBaseDir}/cluster_token.txt"
         check_for_file "${instanceBaseDir}/Master/server.ini"
         check_for_file "${instanceBaseDir}/Caves/server.ini"
-
-
+        # validate binary location
         check_for_file "${installDir}/bin64"
 
-        cd "$install_dir/bin64" || fail
+        cd "${installDir}/bin64" || fail
 
         run_shared=(./dontstarve_dedicated_server_nullrenderer_x64)
         run_shared+=(-console)
-        run_shared+=(-cluster "$cluster_name")
-        run_shared+=(-monitor_parent_process $$)
+        run_shared+=(-cluster "${cluster_name}")
+        run_shared+=(-monitor_parent_process \$\$)
 
-        "$\{run_shared[@]}" -shard Caves  | sed 's/^/Caves:  /' &
-        "$\{run_shared[@]}" -shard Master | sed 's/^/Master: /'
+        "\$\{run_shared[@]\}" -shard Caves  | sed 's/^/Caves:  /' &
+        "\$\{run_shared[@]\}" -shard Master | sed 's/^/Master: /'
       '';
     in
     {
