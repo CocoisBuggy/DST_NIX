@@ -103,8 +103,12 @@ in
       createHome = true;
     };
 
-    environment.systemPackages = with pkgs; [
-      curlWithGnuTls
+    # we need this added.
+    hardware.cpu.cpu-archs = [
+      "i386"
+    ];
+    environment.systemPackages = [
+      pkgs.pkgsMulti.lib32.curlWithGnuTls
     ];
 
     users.groups.${cfg.groupName} = { };
