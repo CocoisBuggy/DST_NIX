@@ -43,8 +43,9 @@ let
         description = "SURVIVAL_TOGETHER, DST_CAVE";
       };
       overrides = mkOption {
-        type = types.attrset;
+        type = types.attrsOf types.anything;
         default = { };
+        description = "A set of override options.";
       };
     };
   };
