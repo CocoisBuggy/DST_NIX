@@ -13,7 +13,6 @@ let
     mkOption
     mkIf
     types
-    mapAttrs'
     nameValuePair
     ;
 
@@ -80,6 +79,7 @@ let
         preStart = ''
           ${pkgs.uutils-coreutils-noprefix}/bin/mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
           chown -R ${cfg.userName}:${cfg.groupName} ${instanceBaseDir}
+
         '';
 
         serviceConfig = {
@@ -94,7 +94,10 @@ let
 
 in
 {
-  imports = [ ./update.nix ];
+  imports = [
+    ./update.nix
+    ./config.nix
+  ];
 
   options.services.dstserver = {
     instances = mkOption {
