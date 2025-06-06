@@ -30,29 +30,6 @@ let
   '';
 in
 {
-  options.services.dstserver = {
-    userName = mkOption {
-      type = types.str;
-      default = "dstserver";
-      description = "User to run the Don't Starve Together server and steamcmd.";
-    };
-    groupName = mkOption {
-      type = types.str;
-      default = "dstserver";
-      description = "Group for the Don't Starve Together server user.";
-    };
-    dataDir = mkOption {
-      type = types.path;
-      default = "/var/lib/dstserver";
-      description = "Directory to store Don't Starve Together server data and user files.";
-    };
-    installDir = mkOption {
-      type = types.path;
-      default = "${cfg.dataDir}/DST_Server";
-      description = "Absolute path for Don't Starve Together server installation via steamcmd.";
-    };
-  };
-
   config = mkIf (cfg.instances != [ ]) {
     systemd.tmpfiles.rules = [
       "d '${cfg.dataDir}' 0750 '${cfg.userName}' '${cfg.groupName}' -"

@@ -74,8 +74,14 @@ let
         preStart = ''
           ${pkgs.uutils-coreutils-noprefix}/bin/mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
           chown -R ${cfg.userName}:${cfg.groupName} ${instanceBaseDir}
-
         '';
+
+        environment = {
+          LD_LIBRARY_PATH = with pkgs; [
+            curl
+            stdenv.cc.cc.lib
+          ];
+        };
 
         serviceConfig = {
           ExecStart = "${pkgs.steam-run}/bin/steam-run ${entrypoint}";
