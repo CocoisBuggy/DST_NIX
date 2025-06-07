@@ -90,7 +90,7 @@ let
 
         environment = {
           LD_LIBRARY_PATH = makeLibraryPath [
-            pkgs-old.curlWithGnuTlscurlWithGnuTls
+            pkgs-old.curlWithGnuTls
             pkgs.stdenv.cc.cc.lib
           ];
         };
