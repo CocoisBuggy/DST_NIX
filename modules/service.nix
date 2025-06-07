@@ -10,9 +10,8 @@ let
 
   inherit (pkgs) writeShellScript;
   inherit (lib)
-    mkOption
     mkIf
-    types
+    mkLibraryPath
     nameValuePair
     ;
 
@@ -77,10 +76,13 @@ let
         '';
 
         environment = {
-          LD_LIBRARY_PATH = with pkgs; [
-            curl
-            stdenv.cc.cc.lib
-          ];
+          LD_LIBRARY_PATH = mkLibraryPath (
+            with pkgs;
+            [
+              curl
+              stdenv.cc.cc.lib
+            ]
+          );
         };
 
         serviceConfig = {
