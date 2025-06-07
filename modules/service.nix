@@ -80,13 +80,7 @@ let
           "network.target"
           "dst-steamcmd-update.service"
         ];
-
         wantedBy = [ "multi-user.target" ];
-
-        preStart = ''
-          ${pkgs.uutils-coreutils-noprefix}/bin/mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
-        '';
-
         environment = {
           LD_LIBRARY_PATH = makeLibraryPath [
             pkgs-old.curlWithGnuTls
