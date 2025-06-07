@@ -22,8 +22,10 @@ let
     sha256 = "sha256-lHrKvEkCPTUO+7tPfjIcb7Trk6k31rz18vkyqmkeJfY=";
   };
 
-  # 2. Import the pinned Nixpkgs so we can access its packages
-  pkgs-old = import nixpkgs-2211 { config = config.nixpkgs.config; };
+  pkgs-old = import nixpkgs-2211 {
+    system = pkgs.system;
+    config = config.nixpkgs.config;
+  };
 
   makeInstanceService =
     instance:
