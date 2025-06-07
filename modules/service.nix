@@ -11,7 +11,7 @@ let
   inherit (pkgs) writeShellScript;
   inherit (lib)
     mkIf
-    makeLibraryPath?
+    makeLibraryPath
     nameValuePair
     ;
 
