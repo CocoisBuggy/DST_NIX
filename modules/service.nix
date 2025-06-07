@@ -85,7 +85,6 @@ let
 
         preStart = ''
           ${pkgs.uutils-coreutils-noprefix}/bin/mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
-          chown -R ${cfg.userName}:${cfg.groupName} ${instanceBaseDir}
         '';
 
         environment = {
