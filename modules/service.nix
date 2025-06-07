@@ -92,7 +92,7 @@ let
           ExecStart = "${pkgs.steam-run}/bin/steam-run ${entrypoint}";
           User = "dstserver";
           Group = "dstserver";
-          WorkingDirectory = instanceBaseDir;
+          # WorkingDirectory = instanceBaseDir;
           Restart = "on-failure";
         };
       };
