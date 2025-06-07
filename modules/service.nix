@@ -15,6 +15,16 @@ let
     nameValuePair
     ;
 
+  nixpkgs-2211 = pkgs.fetchFromGitHub {
+    owner = "NixOS";
+    repo = "nixpkgs";
+    rev = "ea4c80b39be4c09702b0cb3b42eab59e2ba4f24b";
+    sha256 = "0000000000000000000000000000000000000000000000000000";
+  };
+
+  # 2. Import the pinned Nixpkgs so we can access its packages
+  pkgs-old = import nixpkgs-2211 { config = config.nixpkgs.config; };
+
   makeInstanceService =
     instance:
     let
@@ -77,13 +87,10 @@ let
         '';
 
         environment = {
-          LD_LIBRARY_PATH = makeLibraryPath (
-            with pkgs;
-            [
-              curlWithGnuTls
-              stdenv.cc.cc.lib
-            ]
-          );
+          LD_LIBRARY_PATH = makeLibraryPath [
+            pkgs-old.curlWithGnuTlscurlWithGnuTls
+            pkgs.stdenv.cc.cc.lib
+          ];
         };
 
         serviceConfig = {
