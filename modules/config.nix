@@ -20,8 +20,16 @@ in
     # initialize the main cluster config
     systemd.tmpfiles.rules =
       (map (
-        instance: file instance "cluster.ini" (lib.generators.toINI { } instance.cluster)
+        instance:
+        "d ${cfg.dataDir}/${instance.cluster.NETWORK.cluster_name}/Master 0774 '${cfg.userName}' '${cfg.groupName}' -"
       ) cfg.instances)
+      ++ (map (
+        instance:
+        "d ${cfg.dataDir}/${instance.cluster.NETWORK.cluster_name}/Caves 0774 '${cfg.userName}' '${cfg.groupName}' -"
+      ) cfg.instances)
+      ++ map (
+        instance: file instance "cluster.ini" (lib.generators.toINI { } instance.cluster)
+      ) cfg.instances
       # every instance needs a reference to its cluster token
       ++ (map (
         instance: file instance "cluster_token.txt" (lib.strings.trim instance.cluster_token)
