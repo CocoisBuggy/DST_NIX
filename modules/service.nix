@@ -56,11 +56,11 @@ let
         check_for_file "${instanceBaseDir}/Caves/server.ini"
         # validate binary location
         check_for_file "${installDir}/bin64"
+        check_for_file "${installDir}/bin64/dontstarve_dedicated_server_nullrenderer_x64"
 
-        cd "${installDir}/bin64" || fail
+        cd "${instanceBaseDir}" || fail
 
-        run_shared=(./dontstarve_dedicated_server_nullrenderer_x64)
-        run_shared+=(-console)
+        run_shared=(${installDir}/bin64/dontstarve_dedicated_server_nullrenderer_x64)
         run_shared+=(-cluster "${cluster_name}")
         run_shared+=(-monitor_parent_process \$\$)
 
