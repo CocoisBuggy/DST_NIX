@@ -24,7 +24,7 @@ in
       ) cfg.instances)
       # every instance needs a reference to its cluster token
       ++ (map (
-        instance: file instance "cluster_token.txt" (lib.str.trim instance.cluster_token)
+        instance: file instance "cluster_token.txt" (lib.strings.trim instance.cluster_token)
       ) cfg.instances)
 
       # We want to write the master and cave shard server configs, which consists of an ini and a lua script
