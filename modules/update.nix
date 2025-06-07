@@ -30,8 +30,8 @@ in
 {
   config = mkIf (cfg.instances != [ ]) {
     systemd.tmpfiles.rules = [
-      "d '${cfg.dataDir}' 0755 '${cfg.userName}' '${cfg.groupName}' -"
-      "d '${cfg.installDir}' 0755 '${cfg.userName}' '${cfg.groupName}' -"
+      "d '${cfg.dataDir}' 0774 '${cfg.userName}' '${cfg.groupName}' -"
+      "d '${cfg.installDir}' 0774 '${cfg.userName}' '${cfg.groupName}' -"
     ];
 
     systemd.services.dst-steamcmd-update = {

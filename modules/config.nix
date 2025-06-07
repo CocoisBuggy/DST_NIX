@@ -13,7 +13,7 @@ let
 
   file =
     instance: filename: content:
-    "f ${cfg.dataDir}/${instance.cluster.NETWORK.cluster_name}/${filename} 0750 '${cfg.userName}' '${cfg.groupName}' - ${content}";
+    "f ${cfg.dataDir}/${instance.cluster.NETWORK.cluster_name}/${filename} 0774 '${cfg.userName}' '${cfg.groupName}' - ${content}";
 in
 {
   config = mkIf (cfg.instances != [ ]) {

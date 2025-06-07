@@ -85,6 +85,8 @@ let
 
         preStart = ''
           ${pkgs.uutils-coreutils-noprefix}/bin/mkdir -p ${instanceBaseDir}/Master ${instanceBaseDir}/Caves
+          chown -R ${cfg.userName}:${cfg.groupName} ${instanceBaseDir}
+
         '';
 
         environment = {
@@ -124,7 +126,7 @@ in
 
     systemd.tmpfiles.rules = map (
       x:
-      "d '${cfg.dataDir}/${x.cluster.NETWORK.cluster_name}' 0750 '${cfg.userName}' '${cfg.groupName}' -"
+      "d '${cfg.dataDir}/${x.cluster.NETWORK.cluster_name}' 0774 '${cfg.userName}' '${cfg.groupName}' -"
     ) cfg.instances;
 
     systemd.services = lib.foldlAttrs (
