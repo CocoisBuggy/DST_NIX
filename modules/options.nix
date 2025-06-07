@@ -130,6 +130,14 @@ in
                     default = "yippee";
                     description = "Password for the server cluster.";
                   };
+                  offline_cluster = mkOption {
+                    type = types.bool;
+                    default = false;
+                  };
+                  lan_only_cluster = mkOption {
+                    type = types.bool;
+                    default = false;
+                  };
                 };
 
                 MISC = {
