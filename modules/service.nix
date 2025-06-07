@@ -58,8 +58,6 @@ let
         check_for_file "${installDir}/bin64"
         check_for_file "${installDir}/bin64/dontstarve_dedicated_server_nullrenderer_x64"
 
-        cd "${installDir}/bin64" || fail
-
         run_shared=(${installDir}/bin64/dontstarve_dedicated_server_nullrenderer_x64)
         run_shared+=(-persistent_storage_root "${instanceBaseDir}/data")
         run_shared+=(-conf_dir "${instanceBaseDir}")

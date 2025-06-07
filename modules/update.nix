@@ -8,9 +8,7 @@
 let
   cfg = config.services.dstserver;
   inherit (lib)
-    mkOption
     mkIf
-    types
     ;
 
   # Shell script to install/update Don't Starve Together using steamcmd
@@ -32,8 +30,8 @@ in
 {
   config = mkIf (cfg.instances != [ ]) {
     systemd.tmpfiles.rules = [
-      "d '${cfg.dataDir}' 0750 '${cfg.userName}' '${cfg.groupName}' -"
-      "d '${cfg.installDir}' 0750 '${cfg.userName}' '${cfg.groupName}' -"
+      "d '${cfg.dataDir}' 0755 '${cfg.userName}' '${cfg.groupName}' -"
+      "d '${cfg.installDir}' 0755 '${cfg.userName}' '${cfg.groupName}' -"
     ];
 
     systemd.services.dst-steamcmd-update = {
