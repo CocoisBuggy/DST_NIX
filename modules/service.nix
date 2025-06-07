@@ -11,7 +11,7 @@ let
   inherit (pkgs) writeShellScript;
   inherit (lib)
     mkIf
-    mkLibraryPath
+    makeLibraryPath?
     nameValuePair
     ;
 
@@ -76,7 +76,7 @@ let
         '';
 
         environment = {
-          LD_LIBRARY_PATH = mkLibraryPath (
+          LD_LIBRARY_PATH = makeLibraryPath (
             with pkgs;
             [
               curl
