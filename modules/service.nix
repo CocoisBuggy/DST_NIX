@@ -36,6 +36,7 @@ let
         	fi
         }
 
+        echo $LD_LIBRARY_PATH
 
         check_for_file "${instanceBaseDir}/cluster.ini"
         check_for_file "${instanceBaseDir}/cluster_token.txt"
@@ -79,7 +80,7 @@ let
           LD_LIBRARY_PATH = makeLibraryPath (
             with pkgs;
             [
-              curl
+              curlWithGnuTls
               stdenv.cc.cc.lib
             ]
           );
