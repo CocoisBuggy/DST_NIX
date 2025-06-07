@@ -59,7 +59,7 @@ let
         check_for_file "${installDir}/bin64/dontstarve_dedicated_server_nullrenderer_x64"
 
         run_shared=(${installDir}/bin64/dontstarve_dedicated_server_nullrenderer_x64)
-        # run_shared+=(-persistent_storage_root "${instanceBaseDir}/data")
+        run_shared+=(-persistent_storage_root "${instanceBaseDir}")
         run_shared+=(-conf_dir "${instanceBaseDir}")
         run_shared+=(-cluster "${cluster_name}")
         run_shared+=(-monitor_parent_process $$)
