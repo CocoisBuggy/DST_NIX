@@ -3,6 +3,8 @@
 with lib;
 
 let
+  cfg = config.services.dstserver;
+
   shardOptions = preset: {
     ini = {
       NETWORK = {
