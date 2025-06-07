@@ -19,7 +19,7 @@ let
     owner = "NixOS";
     repo = "nixpkgs";
     rev = "ea4c80b39be4c09702b0cb3b42eab59e2ba4f24b";
-    sha256 = "0000000000000000000000000000000000000000000000000000";
+    sha256 = "sha256-lHrKvEkCPTUO+7tPfjIcb7Trk6k31rz18vkyqmkeJfY=";
   };
 
   # 2. Import the pinned Nixpkgs so we can access its packages
