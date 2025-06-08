@@ -62,12 +62,24 @@ let
     };
   };
 
-  mappedInstances = map (x: instanceConfig x.value x.index) (
+  mappedInstances = (lib.trace "mappedInstances: ${builtins.toJSON (map (x: instanceConfig x.value x.index) (
     builtins.genList (i: {
       index = i;
       value = builtins.elemAt cfg.instances i;
     }) (builtins.length cfg.instances)
-  );
+  ))}" (map (x: instanceConfig x.value x.index) (
+    builtins.genList (i: {
+      index = i;
+      value = builtins.elemAt cfg.instances i;
+    }) (builtins.length cfg.instances)
+  )));
+
+  # mappedInstances = map (x: instanceConfig x.value x.index) (
+  #   builtins.genList (i: {
+  #     index = i;
+  #     value = builtins.elemAt cfg.instances i;
+  #   }) (builtins.length cfg.instances)
+  # );
 
   file =
     instance: filename: content:
