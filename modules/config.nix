@@ -13,19 +13,18 @@ let
 
   instanceConfig =
     instance: idx:
-    instance
-    // {
-      cluster = {
+    {
+      master.ini = {
         NETWORK = {
           server_port = 10999 + idx;
-        } // instance.cluster.NETWORK;
+        };
         STEAM = {
           master_server_port = 27016 + idx;
           authentication_port = 8768 + idx;
         };
       };
 
-      master.Caves = {
+      caves.ini = {
         NETWORK = {
           server_port = 11018 - idx;
         };
@@ -35,10 +34,9 @@ let
         };
       };
 
-      cluster.SHARD = {
-        master_port = 10888 + idx;
-      };
-    };
+      cluster.SHARD.master_port = 10888 + idx;
+    }
+    // instance;
 
   mappedInstances = map (x: instanceConfig x.value x.index) (
     builtins.genList (i: {
