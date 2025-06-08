@@ -29,33 +29,184 @@ let
       };
     };
 
-  shardOptions = preset: {
-    ini = {
-      SHARD = {
-        is_master = mkOption {
-          type = types.bool;
-          default = (preset == "SURVIVAL_TOGETHER");
-          description = "Which shard should the cluster treat as the primary one?";
+  # This is the definition for a single DST server instance
+  dstInstanceType = types.submodule (
+    { config, name, ... }:
+    {
+      options = {
+        instanceName = mkOption {
+          type = types.str;
+          default = name; # Use the attribute name as the instance name by default
+          description = "Name of the DST server instance (e.g., 'matthew_torment').";
+        };
+
+        cluster_token = mkOption {
+          type = types.str;
+          description = "Klei cluster token for this instance.";
+        };
+
+        # --- Options for the Master Shard ---
+        master = {
+          # These are options for the Master shard's specific settings
+          # (e.g., from your previous snippet: bind_ip, master_ip, etc.)
+          bind_ip = mkOption {
+            type = types.str;
+            default = "127.0.0.1";
+          };
+          server_port = mkOption {
+            type = types.int;
+            default = 10999;
+            description = "Main server port for Master.";
+          };
+          cluster_key = mkOption {
+            type = types.str;
+            default = "supersecretkey";
+          }; # Key for inter-shard comms
+
+          # Options for GAMEPLAY settings (these are the ones missing in your INI)
+          gameplay = {
+            maxPlayers = mkOption {
+              type = types.int;
+              default = 6;
+            };
+            pvpEnabled = mkOption {
+              type = types.bool;
+              default = false;
+            };
+            gameMode = mkOption {
+              type = types.str;
+              default = "survival";
+            };
+            # ... more gameplay options
+          };
+
+          # This will be the *generated INI content object* for the Master shard
+          ini = mkOption {
+            type = types.attrs; # It's an attrset, but its value is derived
+            readOnly = true; # Mark as read-only because it's computed
+            description = "The generated INI content for the Master shard's server.ini.";
+          };
+
+          # Similarly for Lua worldgenoverride
+          lua = mkOption {
+            type = types.attrs; # Use types.attrs or types.submodule if it has a structure
+            readOnly = true;
+            description = "The Lua config for Master shard's worldgenoverride.lua.";
+          };
+        };
+
+        # --- Options for the Caves Shard ---
+        caves = {
+          # These are options for the Caves shard's specific settings
+          bind_ip = mkOption {
+            type = types.str;
+            default = "127.0.0.1";
+          };
+          server_port = mkOption {
+            type = types.int;
+            default = 10998;
+            description = "Main server port for Caves.";
+          };
+          master_ip = mkOption {
+            type = types.str;
+            default = "127.0.0.1";
+          }; # Caves connects to Master
+          master_port = mkOption {
+            type = types.int;
+            default = 10889;
+          }; # Caves connects to Master
+          cluster_key = mkOption {
+            type = types.str;
+            default = "supersecretkey";
+          }; # Needs to match master
+
+          ini = mkOption {
+            type = types.attrs;
+            readOnly = true;
+            description = "The generated INI content for the Caves shard's server.ini.";
+          };
+
+          lua = mkOption {
+            type = types.attrs;
+            readOnly = true;
+            description = "The Lua config for Caves shard's worldgenoverride.lua.";
+          };
         };
       };
-    };
-    lua = {
-      override_enabled = mkOption {
-        type = types.bool;
-        default = true;
+
+      # --- Configuration for a single instance (where the magic happens) ---
+      config = {
+        # Master shard's INI object (this is the key refactor)
+        # We combine the gameplay options (from the instance's master.gameplay)
+        # with network options, etc., into the structure expected by lib.generators.toINI
+        master.ini = {
+          GAMEPLAY = {
+            max_players = config.master.gameplay.maxPlayers;
+            pvp = if config.master.gameplay.pvpEnabled then "true" else "false";
+            game_mode = config.master.gameplay.gameMode;
+            # ... other gameplay attrs
+          };
+          NETWORK = {
+            server_port = toString config.master.server_port;
+            server_ip = config.master.bind_ip;
+            # ... other network attrs
+          };
+          # [SHARD] section for Master shard.ini
+          SHARD = {
+            shard_name = "Master";
+            shard_id = "Master";
+            is_master = true;
+            cluster_key = config.master.cluster_key;
+          };
+          # ... other sections like [STEAM], [MISC]
+        };
+
+        # Caves shard's INI object
+        caves.ini = {
+          GAMEPLAY = {
+            # Caves usually inherits some gameplay settings from Master
+            # or you can define them independently in caves.gameplay options
+            max_players = config.master.gameplay.maxPlayers; # Example: using Master's max players
+            pvp = if config.master.gameplay.pvpEnabled then "true" else "false";
+            game_mode = config.master.gameplay.gameMode;
+            # ... more gameplay attrs specific to caves if needed
+          };
+          NETWORK = {
+            server_port = toString config.caves.server_port;
+            server_ip = config.caves.bind_ip;
+            # ... other network attrs
+          };
+          # [SHARD] section for Caves shard.ini
+          SHARD = {
+            shard_name = "Caves";
+            shard_id = "Caves";
+            is_master = false; # Caves is not the master shard
+            master_ip = config.caves.master_ip;
+            master_port = toString config.caves.master_port;
+            cluster_key = config.caves.cluster_key; # Must match master_key
+          };
+          # ... other sections
+        };
+
+        # Master shard's Lua override (example structure)
+        master.lua = {
+          # Lua objects usually have a specific structure required by renderLuaFile
+          # Example: for worldgenoverride.lua, it's often a table with PREFAB, PRESET, etc.
+          PREFAB = "world";
+          PRESET = "DEFAULT"; # Or 'MEDIUM', 'SMALL', etc.
+          # ... more worldgenoverride settings
+        };
+
+        # Caves shard's Lua override
+        caves.lua = {
+          # Same structure as master.lua but for caves
+          PREFAB = "cave";
+          PRESET = "DEFAULT_CAVE";
+          # ...
+        };
       };
-      preset = mkOption {
-        type = types.str;
-        default = preset;
-        description = "SURVIVAL_TOGETHER, DST_CAVE";
-      };
-      overrides = mkOption {
-        type = types.attrsOf types.anything;
-        default = { };
-        description = "A set of override options.";
-      };
-    };
-  };
+    }
+  );
 in
 {
   options.services.dstserver = {
@@ -80,129 +231,7 @@ in
       description = "Absolute path for Don't Starve Together server installation via steamcmd.";
     };
     instances = mkOption {
-      type = types.listOf (
-        types.submodule (
-          { ... }:
-          {
-            options = {
-              cluster_token = mkOption {
-                type = types.str;
-                description = "A required secret token that the cluster uses to talk to the klei server";
-              };
-
-              mods = mkOption {
-                type = types.attrsOf (types.submodule modOption);
-                default = { };
-                description = ''
-                  An attribute set of extra mods/entries to configure.
-                  Each key represents the workshop ID of the mod/entry,
-                  and its value is an attribute set with 'enabled' and 'configuration_options'.
-                '';
-                example = literalExpression ''
-                  mods = {
-                    # Global Positions
-                    "workshop-2902364746" = {
-                      enabled = true;
-                      configuration_options = {
-                        mode = "Eassy Cartography";
-                        someOtherSetting = 123;
-                      };
-                    };
-                    "my-custom-mod" = {
-                      enabled = false;
-                    };
-                  };
-                '';
-              };
-
-              cluster = {
-                GAMEPLAY = {
-                  game_mode = mkOption {
-                    type = types.str;
-                    default = "survival";
-                    description = "Game mode for the server (e.g., survival).";
-                  };
-                  max_players = mkOption {
-                    type = types.int;
-                    default = 12;
-                    description = "Maximum number of players.";
-                  };
-                  pvp = mkOption {
-                    type = types.bool;
-                    default = false;
-                    description = "Whether PVP is enabled.";
-                  };
-                  pause_when_empty = mkOption {
-                    type = types.bool;
-                    default = true;
-                    description = "Whether the server pauses when no players are present.";
-                  };
-                };
-
-                NETWORK = {
-                  cluster_description = mkOption {
-                    type = types.str;
-                    default = "We be starving out here";
-                    description = "Cluster description shown to players.";
-                  };
-                  cluster_name = mkOption {
-                    type = types.str;
-                    description = "Name of the server cluster.";
-                  };
-                  cluster_password = mkOption {
-                    type = types.str;
-                    default = "yippee";
-                    description = "Password for the server cluster.";
-                  };
-                  offline_cluster = mkOption {
-                    type = types.bool;
-                    default = false;
-                  };
-                  lan_only_cluster = mkOption {
-                    type = types.bool;
-                    default = false;
-                  };
-                };
-
-                MISC = {
-                  console_enabled = mkOption {
-                    type = types.bool;
-                    default = true;
-                    description = "Enable the in-game console.";
-                  };
-                };
-
-                SHARD = {
-                  shard_enabled = mkOption {
-                    type = types.bool;
-                    default = true;
-                    description = "Enable shard networking.";
-                  };
-                  bind_ip = mkOption {
-                    type = types.str;
-                    default = "127.0.0.1";
-                    description = "IP address to bind for this shard.";
-                  };
-                  master_ip = mkOption {
-                    type = types.str;
-                    default = "127.0.0.1";
-                    description = "IP address of the master shard.";
-                  };
-                  cluster_key = mkOption {
-                    type = types.str;
-                    default = "supersecretkey";
-                    description = "Key used for shard authentication.";
-                  };
-                };
-              };
-
-              master = shardOptions "SURVIVAL_TOGETHER";
-              caves = shardOptions "DST_CAVE";
-            };
-          }
-        )
-      );
-
+      type = types.listOf dstInstanceType;
       default = [ ];
       description = "List of DST service instances.";
     };
