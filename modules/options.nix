@@ -34,10 +34,20 @@ let
     { config, name, ... }:
     {
       options = {
-        instanceName = mkOption {
+        name = mkOption {
           type = types.str;
           default = name; # Use the attribute name as the instance name by default
           description = "Name of the DST server instance (e.g., 'matthew_torment').";
+        };
+
+        description = mkOption {
+          type = types.str;
+          description = "";
+        };
+
+        password = mkOption {
+          type = types.str;
+          description = "Does this cluster have a password?";
         };
 
         cluster_token = mkOption {
@@ -46,9 +56,10 @@ let
         };
 
         # --- Options for the Master Shard ---
+        # these contents will appear in the cluster.ini
+        # https://forums.kleientertainment.com/forums/topic/64552-dedicated-server-settings-guide/
         master = {
           # These are options for the Master shard's specific settings
-          # (e.g., from your previous snippet: bind_ip, master_ip, etc.)
           bind_ip = mkOption {
             type = types.str;
             default = "127.0.0.1";
@@ -63,7 +74,6 @@ let
             default = "supersecretkey";
           }; # Key for inter-shard comms
 
-          # Options for GAMEPLAY settings (these are the ones missing in your INI)
           gameplay = {
             maxPlayers = mkOption {
               type = types.int;
@@ -136,8 +146,15 @@ let
 
       # --- Configuration for a single instance (where the magic happens) ---
       config = {
-        # Master shard's INI object (this is the key refactor)
-        # We combine the gameplay options (from the instance's master.gameplay)
+        cluser = {
+          NETWORK = {
+            cluster_name = config.instanceName;
+            cluster_description = config.description;
+            cluster_password = config.password;
+          };
+        };
+        # Master shard's INI object
+        # # We combine the gameplay options (from the instance's master.gameplay)
         # with network options, etc., into the structure expected by lib.generators.toINI
         master.ini = {
           GAMEPLAY = {

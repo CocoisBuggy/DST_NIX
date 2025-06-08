@@ -30,12 +30,12 @@ let
   makeInstanceService =
     instance:
     let
-      cluster_name = instance.cluster.NETWORK.cluster_name;
+      cluster_name = instance.name;
       instanceBaseDir = "${cfg.dataDir}/${cluster_name}";
       inherit (cfg) installDir;
 
       entrypoint = writeShellScript "entrypoint.sh" ''
-         function fail()
+        function fail()
         {
         	echo Error: "$@" >&2
         	exit 1
@@ -120,12 +120,12 @@ in
 
     systemd.tmpfiles.rules = map (
       x:
-      "d '${cfg.dataDir}/${x.cluster.NETWORK.cluster_name}' 0774 '${cfg.userName}' '${cfg.groupName}' -"
+      "d '${cfg.dataDir}/${x.name}' 0774 '${cfg.userName}' '${cfg.groupName}' -"
     ) cfg.instances;
 
     systemd.services = lib.foldlAttrs (
       acc: instanceName: instCfg:
       acc // makeInstanceService instCfg
-    ) { } (lib.listToAttrs (map (i: nameValuePair i.cluster.NETWORK.cluster_name i) cfg.instances));
+    ) { } (lib.listToAttrs (map (i: nameValuePair i.name i) cfg.instances));
   };
 }

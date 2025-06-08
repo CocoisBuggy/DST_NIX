@@ -47,7 +47,7 @@ let
 
   file =
     instance: filename: content:
-    "f+ ${cfg.dataDir}/${instance.cluster.NETWORK.cluster_name}/${filename} 0774 '${cfg.userName}' '${cfg.groupName}' - ${content}";
+    "f+ ${cfg.dataDir}/${instance.name}/${filename} 0774 '${cfg.userName}' '${cfg.groupName}' - ${content}";
 in
 {
   config = mkIf (cfg.instances != [ ]) {
@@ -55,11 +55,11 @@ in
     systemd.tmpfiles.rules =
       (map (
         instance:
-        "d ${cfg.dataDir}/${instance.cluster.NETWORK.cluster_name}/Master 0774 '${cfg.userName}' '${cfg.groupName}' -"
+        "d ${cfg.dataDir}/${instance.name}/Master 0774 '${cfg.userName}' '${cfg.groupName}' -"
       ) cfg.instances)
       ++ (map (
         instance:
-        "d ${cfg.dataDir}/${instance.cluster.NETWORK.cluster_name}/Caves 0774 '${cfg.userName}' '${cfg.groupName}' -"
+        "d ${cfg.dataDir}/${instance.name}/Caves 0774 '${cfg.userName}' '${cfg.groupName}' -"
       ) cfg.instances)
       ++ map (
         instance: file instance "cluster.ini" (lib.generators.toINI { } instance.cluster)
