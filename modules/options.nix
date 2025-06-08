@@ -5,6 +5,30 @@ with lib;
 let
   cfg = config.services.dstserver;
 
+  # Define the structure for a single mod or entry
+  modOption =
+    { name, ... }:
+    {
+      options = {
+        enabled = mkOption {
+          type = types.bool;
+          default = false;
+          description = "Whether this mod/entry is enabled.";
+        };
+
+        # Use types.attrsOf types.unspecified or types.anything for flexible configuration_options
+        configuration_options = mkOption {
+          type = types.attrsOf types.unspecified; # Or types.attrs if you expect attributes
+          # type = types.anything; # Even more flexible, allows any Nix value
+          default = { };
+          description = ''
+            Arbitrary configuration options for this mod/entry.
+            This will be passed directly to the 'configuration_options' key.
+          '';
+        };
+      };
+    };
+
   shardOptions = preset: {
     ini = {
       NETWORK = {
@@ -83,6 +107,31 @@ in
               cluster_token = mkOption {
                 type = types.str;
                 description = "A required secret token that the cluster uses to talk to the klei server";
+              };
+
+              mods = mkOption {
+                type = types.attrsOf (types.submodule modOption);
+                default = { };
+                description = ''
+                  An attribute set of extra mods/entries to configure.
+                  Each key represents the workshop ID of the mod/entry,
+                  and its value is an attribute set with 'enabled' and 'configuration_options'.
+                '';
+                example = literalExpression ''
+                  mods = {
+                    # Global Positions
+                    "workshop-2902364746" = {
+                      enabled = true;
+                      configuration_options = {
+                        mode = "Eassy Cartography";
+                        someOtherSetting = 123;
+                      };
+                    };
+                    "my-custom-mod" = {
+                      enabled = false;
+                    };
+                  };
+                '';
               };
 
               cluster = {
