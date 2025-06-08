@@ -31,30 +31,11 @@ let
 
   shardOptions = preset: {
     ini = {
-      NETWORK = {
-        server_port = mkOption {
-          type = types.int;
-          default = 11000;
-          description = "Each shard has its own port binding";
-        };
-      };
       SHARD = {
         is_master = mkOption {
           type = types.bool;
           default = (preset == "SURVIVAL_TOGETHER");
           description = "Which shard should the cluster treat as the primary one?";
-        };
-      };
-      STEAM = {
-        master_server_port = mkOption {
-          type = types.int;
-          default = 27018;
-          description = "Slightly mystical to me, except that each shard increments by 1";
-        };
-        authentication_port = mkOption {
-          type = types.int;
-          default = 8768;
-          description = "Slightly mystical to me, except that each shard increments by 1";
         };
       };
     };
@@ -206,11 +187,6 @@ in
                     type = types.str;
                     default = "127.0.0.1";
                     description = "IP address of the master shard.";
-                  };
-                  master_port = mkOption {
-                    type = types.int;
-                    default = 10889;
-                    description = "Port of the master shard.";
                   };
                   cluster_key = mkOption {
                     type = types.str;
