@@ -15,7 +15,7 @@ let
     instance: idx:
     instance
     // {
-      master = {
+      cluster = {
         NETWORK = {
           server_port = 10999 + idx;
         };
