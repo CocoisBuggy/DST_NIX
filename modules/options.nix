@@ -31,12 +31,11 @@ let
 
   # This is the definition for a single DST server instance
   dstInstanceType = types.submodule (
-    { config, name, ... }:
+    { ... }:
     {
       options = {
         name = mkOption {
           type = types.str;
-          default = name; # Use the attribute name as the instance name by default
           description = "Name of the DST server instance (e.g., 'matthew_torment').";
         };
 
