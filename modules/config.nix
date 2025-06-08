@@ -1,15 +1,9 @@
-{
-  config,
-  lib,
-  ...
-}:
+{ config, lib, pkgs, ... }: # Add pkgs to the function arguments
 let
   luaGen = import ./lua-generator.nix { inherit lib; };
   cfg = config.services.dstserver;
 
-  inherit (lib)
-    mkIf
-    ;
+  inherit (lib) mkIf;
 
   instanceConfig = instance: idx: {
     inherit (instance) name cluster_token overrides;
@@ -36,10 +30,10 @@ let
 
     cluster = {
       GAMEPLAY = {
-        game_mode = instance.gameMode; #  "survival";
-        max_players = instance.maxPlayers; #  6;
-        pvp = instance.pvp; #  false;
-        pause_when_empty = instance.pauseWhenEmpty; #  true;
+        game_mode = instance.gameMode;
+        max_players = instance.maxPlayers;
+        pvp = instance.pvp;
+        pause_when_empty = instance.pauseWhenEmpty;
       };
 
       NETWORK = {
@@ -62,32 +56,20 @@ let
     };
   };
 
-  mappedInstances = (lib.trace "mappedInstances: ${builtins.toINI (map (x: instanceConfig x.value x.index) (
+  mappedInstances = map (x: instanceConfig x.value x.index) (
     builtins.genList (i: {
       index = i;
       value = builtins.elemAt cfg.instances i;
     }) (builtins.length cfg.instances)
-  ))}" (map (x: instanceConfig x.value x.index) (
-    builtins.genList (i: {
-      index = i;
-      value = builtins.elemAt cfg.instances i;
-    }) (builtins.length cfg.instances)
-  )));
+  );
 
-  # mappedInstances = map (x: instanceConfig x.value x.index) (
-  #   builtins.genList (i: {
-  #     index = i;
-  #     value = builtins.elemAt cfg.instances i;
-  #   }) (builtins.length cfg.instances)
-  # );
+  # New helper function to write content to a Nix store path
+  writeDstFile = filename: content:
+    pkgs.writeText "${filename}-dst" content;
 
-  file =
-    instance: filename: content:
-    "f+ ${cfg.dataDir}/${instance.name}/${filename} 0774 '${cfg.userName}' '${cfg.groupName}' - ${content}";
 in
 {
   config = mkIf (cfg.instances != [ ]) {
-    # initialize the main cluster config
     systemd.tmpfiles.rules =
       (map (
         instance: "d ${cfg.dataDir}/${instance.name}/Master 0774 '${cfg.userName}' '${cfg.groupName}' -"
@@ -95,28 +77,61 @@ in
       ++ (map (
         instance: "d ${cfg.dataDir}/${instance.name}/Caves 0774 '${cfg.userName}' '${cfg.groupName}' -"
       ) cfg.instances)
+      # Use the 'L' (symlink) type to link to the generated file in the Nix store
+      # Or 'f+' with a copy command if you really want a copy on disk
       ++ map (
-        instance: file instance "cluster.ini" (lib.generators.toINI { } instance.cluster)
+        instance:
+          let
+            iniContent = lib.generators.toINI { } instance.cluster;
+            iniPath = writeDstFile "cluster.ini" iniContent;
+          in
+          "L ${cfg.dataDir}/${instance.name}/cluster.ini - - - - ${iniPath}"
       ) mappedInstances
       # every instance needs a reference to its cluster token
       ++ (map (
-        instance: file instance "cluster_token.txt" (lib.strings.trim instance.cluster_token)
+        instance:
+          let
+            tokenContent = lib.strings.trim instance.cluster_token;
+            tokenPath = writeDstFile "cluster_token.txt" tokenContent;
+          in
+          "L ${cfg.dataDir}/${instance.name}/cluster_token.txt - - - - ${tokenPath}"
       ) mappedInstances)
 
-      # We want to write the master and cave shard server configs, which consists of an ini and a lua script
+      # Master server.ini
       ++ (map (
-        instance: file instance "Master/server.ini" (lib.generators.toINI { } instance.master.ini)
+        instance:
+          let
+            iniContent = lib.generators.toINI { } instance.master.ini;
+            iniPath = writeDstFile "Master-server.ini" iniContent;
+          in
+          "L ${cfg.dataDir}/${instance.name}/Master/server.ini - - - - ${iniPath}"
       ) mappedInstances)
+      # Caves server.ini
       ++ (map (
-        instance: file instance "Caves/server.ini" (lib.generators.toINI { } instance.caves.ini)
+        instance:
+          let
+            iniContent = lib.generators.toINI { } instance.caves.ini;
+            iniPath = writeDstFile "Caves-server.ini" iniContent;
+          in
+          "L ${cfg.dataDir}/${instance.name}/Caves/server.ini - - - - ${iniPath}"
       ) mappedInstances)
 
       # The lua override is a bit more of a trick.
       ++ (map (
-        instance: file instance "Master/worldgenoverride.lua" (luaGen.renderLuaFile instance.overrides.master)
+        instance:
+          let
+            luaContent = luaGen.renderLuaFile instance.overrides.master;
+            luaPath = writeDstFile "Master-worldgenoverride.lua" luaContent;
+          in
+          "L ${cfg.dataDir}/${instance.name}/Master/worldgenoverride.lua - - - - ${luaPath}"
       ) mappedInstances)
       ++ (map (
-        instance: file instance "Caves/worldgenoverride.lua" (luaGen.renderLuaFile instance.overrides.caves)
+        instance:
+          let
+            luaContent = luaGen.renderLuaFile instance.overrides.caves;
+            luaPath = writeDstFile "Caves-worldgenoverride.lua" luaContent;
+          in
+          "L ${cfg.dataDir}/${instance.name}/Caves/worldgenoverride.lua - - - - ${luaPath}"
       ) mappedInstances);
   };
 }
