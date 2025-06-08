@@ -34,7 +34,7 @@ let
       NETWORK = {
         server_port = mkOption {
           type = types.int;
-          example = 11000;
+          default = 11000;
           description = "Each shard has its own port binding";
         };
       };
@@ -48,12 +48,12 @@ let
       STEAM = {
         master_server_port = mkOption {
           type = types.int;
-          example = 27018;
+          default = 27018;
           description = "Slightly mystical to me, except that each shard increments by 1";
         };
         authentication_port = mkOption {
           type = types.int;
-          example = 8768;
+          default = 8768;
           description = "Slightly mystical to me, except that each shard increments by 1";
         };
       };
