@@ -11,32 +11,54 @@ let
     mkIf
     ;
 
-  instanceConfig =
-    instance: idx:
-    {
-      master.ini = {
-        NETWORK = {
-          server_port = 10999 + idx;
-        };
-        STEAM = {
-          master_server_port = 27016 + idx;
-          authentication_port = 8768 + idx;
-        };
+  instanceConfig = instance: idx: {
+    master.ini = {
+      NETWORK = {
+        server_port = 10999 + idx;
+      };
+      STEAM = {
+        master_server_port = 27016 + idx;
+        authentication_port = 8768 + idx;
+      };
+    };
+
+    caves.ini = {
+      NETWORK = {
+        server_port = 11018 - idx;
+      };
+      STEAM = {
+        master_server_port = 28016 + idx;
+        authentication_port = 8768 + idx;
+      };
+    };
+
+    cluster = {
+      GAMEPLAY = {
+        game_mode = instance.gameMode; #  "survival";
+        max_players = instance.maxPlayers; #  6;
+        pvp = instance.pvp; #  false;
+        pause_when_empty = instance.pauseWhenEmpty; #  true;
       };
 
-      caves.ini = {
-        NETWORK = {
-          server_port = 11018 - idx;
-        };
-        STEAM = {
-          master_server_port = 28016 + idx;
-          authentication_port = 8768 + idx;
-        };
+      NETWORK = {
+        cluster_description = instance.description;
+        cluster_name = instance.name;
+        cluster_password = instance.password;
       };
 
-      cluster.SHARD.master_port = 10888 + idx;
-    }
-    // instance;
+      MISC = {
+        console_enabled = true;
+      };
+
+      SHARD = {
+        shard_enabled = true;
+        bind_ip = "127.0.0.1";
+        master_ip = "127.0.0.1";
+        master_port = 10888 + idx;
+        cluster_key = "supersecretkey";
+      };
+    };
+  };
 
   mappedInstances = map (x: instanceConfig x.value x.index) (
     builtins.genList (i: {
@@ -54,12 +76,10 @@ in
     # initialize the main cluster config
     systemd.tmpfiles.rules =
       (map (
-        instance:
-        "d ${cfg.dataDir}/${instance.name}/Master 0774 '${cfg.userName}' '${cfg.groupName}' -"
+        instance: "d ${cfg.dataDir}/${instance.name}/Master 0774 '${cfg.userName}' '${cfg.groupName}' -"
       ) cfg.instances)
       ++ (map (
-        instance:
-        "d ${cfg.dataDir}/${instance.name}/Caves 0774 '${cfg.userName}' '${cfg.groupName}' -"
+        instance: "d ${cfg.dataDir}/${instance.name}/Caves 0774 '${cfg.userName}' '${cfg.groupName}' -"
       ) cfg.instances)
       ++ map (
         instance: file instance "cluster.ini" (lib.generators.toINI { } instance.cluster)
@@ -79,10 +99,10 @@ in
 
       # The lua override is a bit more of a trick.
       ++ (map (
-        instance: file instance "Master/worldgenoverride.lua" (luaGen.renderLuaFile instance.master.lua)
+        instance: file instance "Master/worldgenoverride.lua" (luaGen.renderLuaFile instance.overrides.master)
       ) mappedInstances)
       ++ (map (
-        instance: file instance "Caves/worldgenoverride.lua" (luaGen.renderLuaFile instance.caves.lua)
+        instance: file instance "Caves/worldgenoverride.lua" (luaGen.renderLuaFile instance.overrides.cave)
       ) mappedInstances);
   };
 }

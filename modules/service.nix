@@ -119,8 +119,7 @@ in
     users.groups.${cfg.groupName} = { };
 
     systemd.tmpfiles.rules = map (
-      x:
-      "d '${cfg.dataDir}/${x.name}' 0774 '${cfg.userName}' '${cfg.groupName}' -"
+      x: "d '${cfg.dataDir}/${x.name}' 0774 '${cfg.userName}' '${cfg.groupName}' -"
     ) cfg.instances;
 
     systemd.services = lib.foldlAttrs (
