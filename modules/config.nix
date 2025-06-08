@@ -62,7 +62,7 @@ let
     };
   };
 
-  mappedInstances = (lib.trace "mappedInstances: ${builtins.toJSON (map (x: instanceConfig x.value x.index) (
+  mappedInstances = (lib.trace "mappedInstances: ${builtins.toINI (map (x: instanceConfig x.value x.index) (
     builtins.genList (i: {
       index = i;
       value = builtins.elemAt cfg.instances i;
