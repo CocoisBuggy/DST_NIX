@@ -12,7 +12,7 @@ let
     ;
 
   instanceConfig = instance: idx: {
-    name = instance.name;
+    inherit instance (name cluster_token);
 
     master.ini = {
       NETWORK = {
