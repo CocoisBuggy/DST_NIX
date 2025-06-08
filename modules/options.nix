@@ -79,13 +79,13 @@ let
         };
 
         overrides.caves = mkOption {
-          type = types.attrsOf types.any;
+          type = types.attrsOf types.anything;
           default = { };
           description = "These worldgen overrides will be passed to the worldgenlua file";
         };
 
         overrides.master = mkOption {
-          type = types.attrsOf types.any;
+          type = types.attrsOf types.anything;
           default = { };
           description = "These worldgen overrides will be passed to the worldgenlua file";
         };
