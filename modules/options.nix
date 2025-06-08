@@ -146,23 +146,25 @@ let
 
       # --- Configuration for a single instance (where the magic happens) ---
       config = {
-        cluser = {
+        cluster = {
           NETWORK = {
             cluster_name = config.instanceName;
             cluster_description = config.description;
             cluster_password = config.password;
           };
-        };
-        # Master shard's INI object
-        # # We combine the gameplay options (from the instance's master.gameplay)
-        # with network options, etc., into the structure expected by lib.generators.toINI
-        master.ini = {
+
           GAMEPLAY = {
             max_players = config.master.gameplay.maxPlayers;
             pvp = if config.master.gameplay.pvpEnabled then "true" else "false";
             game_mode = config.master.gameplay.gameMode;
             # ... other gameplay attrs
           };
+        };
+        # Master shard's INI object
+        # # We combine the gameplay options (from the instance's master.gameplay)
+        # with network options, etc., into the structure expected by lib.generators.toINI
+        master.ini = {
+
           NETWORK = {
             server_port = toString config.master.server_port;
             server_ip = config.master.bind_ip;
