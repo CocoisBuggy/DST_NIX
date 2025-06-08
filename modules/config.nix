@@ -43,7 +43,7 @@ let
   mappedInstances = map (x: instanceConfig x.value x.index) (
     builtins.genList (i: {
       index = i;
-      value = builtins.elemAt cfg.instances;
+      value = builtins.elemAt cfg.instances i;
     }) (builtins.length cfg.instances)
   );
 
