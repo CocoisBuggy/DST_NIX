@@ -14,7 +14,7 @@ let
       };
       STEAM = {
         master_server_port = 27016 + idx;
-        authentication_port = 8768 + idx;
+        authentication_port = 8868 + idx;
       };
     };
 
@@ -77,6 +77,7 @@ in
       ++ (map (
         instance: "d ${cfg.dataDir}/${instance.name}/Caves 0774 '${cfg.userName}' '${cfg.groupName}' -"
       ) cfg.instances)
+
       # Use the 'L' (symlink) type to link to the generated file in the Nix store
       # Or 'f+' with a copy command if you really want a copy on disk
       ++ map (
