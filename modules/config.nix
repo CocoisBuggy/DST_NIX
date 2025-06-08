@@ -104,7 +104,7 @@ in
         instance: file instance "Master/worldgenoverride.lua" (luaGen.renderLuaFile instance.overrides.master)
       ) mappedInstances)
       ++ (map (
-        instance: file instance "Caves/worldgenoverride.lua" (luaGen.renderLuaFile instance.overrides.cave)
+        instance: file instance "Caves/worldgenoverride.lua" (luaGen.renderLuaFile instance.overrides.caves)
       ) mappedInstances);
   };
 }
