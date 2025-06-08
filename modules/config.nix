@@ -12,6 +12,8 @@ let
     ;
 
   instanceConfig = instance: idx: {
+    name = instance.name;
+
     master.ini = {
       NETWORK = {
         server_port = 10999 + idx;
