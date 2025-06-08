@@ -77,7 +77,7 @@ in
     instances = mkOption {
       type = types.listOf (
         types.submodule (
-          { name, ... }:
+          { ... }:
           {
             options = {
               cluster_token = mkOption {
