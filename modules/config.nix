@@ -18,7 +18,7 @@ let
       cluster = {
         NETWORK = {
           server_port = 10999 + idx;
-        };
+        } // instance.cluster.NETWORK;
         STEAM = {
           master_server_port = 27016 + idx;
           authentication_port = 8768 + idx;
