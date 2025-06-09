@@ -46,11 +46,11 @@ in
   #
   # at this level we are not interested in the encoding, but we WILL try and help
   # the little luagen unit do its job by being cognizant of how we are treating
-  # lua as a little config language, NOT a programming languag
+  # lua as a little config language, NOT a programming language
   makeModOverrides =
     mods:
     lib.attrsets.foldAttrs (x: n: x // n) { } (
-      lib.attrsets.mapAttrsToList (id: value: { "[workshop-${id}]" = value; }) mods
+      lib.attrsets.mapAttrsToList (id: value: { "[\"workshop-${id}\"]" = value; }) mods
     );
 
   # Make the simple lua setup (dedicated_server_mods_setup.lua)
