@@ -3,7 +3,7 @@
   ...
 }:
 let
-  inherit (lib) mkIf types mkOption;
+  inherit (lib) types mkOption;
 
   # Define the structure for a single mod or entry
   modOptions = types.submodule (
