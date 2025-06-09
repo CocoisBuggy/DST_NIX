@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }: # Add pkgs to the function arguments
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: # Add pkgs to the function arguments
 let
   luaGen = import ./lua-generator.nix { inherit lib; };
   cfg = config.services.dstserver;
@@ -16,6 +21,9 @@ let
         master_server_port = 27016 + idx;
         authentication_port = 8868 + idx;
       };
+      SHARD = {
+        is_master = true;
+      };
     };
 
     caves.ini = {
@@ -25,6 +33,10 @@ let
       STEAM = {
         master_server_port = 28016 + idx;
         authentication_port = 8768 + idx;
+      };
+      SHARD = {
+        is_master = false;
+        name = "Caves";
       };
     };
 
@@ -64,8 +76,7 @@ let
   );
 
   # New helper function to write content to a Nix store path
-  writeDstFile = filename: content:
-    pkgs.writeText "${filename}-dst" content;
+  writeDstFile = filename: content: pkgs.writeText "${filename}-dst" content;
 
 in
 {
@@ -82,57 +93,57 @@ in
       # Or 'f+' with a copy command if you really want a copy on disk
       ++ map (
         instance:
-          let
-            iniContent = lib.generators.toINI { } instance.cluster;
-            iniPath = writeDstFile "cluster.ini" iniContent;
-          in
-          "L ${cfg.dataDir}/${instance.name}/cluster.ini - - - - ${iniPath}"
+        let
+          iniContent = lib.generators.toINI { } instance.cluster;
+          iniPath = writeDstFile "cluster.ini" iniContent;
+        in
+        "L ${cfg.dataDir}/${instance.name}/cluster.ini - - - - ${iniPath}"
       ) mappedInstances
       # every instance needs a reference to its cluster token
       ++ (map (
         instance:
-          let
-            tokenContent = lib.strings.trim instance.cluster_token;
-            tokenPath = writeDstFile "cluster_token.txt" tokenContent;
-          in
-          "L ${cfg.dataDir}/${instance.name}/cluster_token.txt - - - - ${tokenPath}"
+        let
+          tokenContent = lib.strings.trim instance.cluster_token;
+          tokenPath = writeDstFile "cluster_token.txt" tokenContent;
+        in
+        "L ${cfg.dataDir}/${instance.name}/cluster_token.txt - - - - ${tokenPath}"
       ) mappedInstances)
 
       # Master server.ini
       ++ (map (
         instance:
-          let
-            iniContent = lib.generators.toINI { } instance.master.ini;
-            iniPath = writeDstFile "Master-server.ini" iniContent;
-          in
-          "L ${cfg.dataDir}/${instance.name}/Master/server.ini - - - - ${iniPath}"
+        let
+          iniContent = lib.generators.toINI { } instance.master.ini;
+          iniPath = writeDstFile "Master-server.ini" iniContent;
+        in
+        "L ${cfg.dataDir}/${instance.name}/Master/server.ini - - - - ${iniPath}"
       ) mappedInstances)
       # Caves server.ini
       ++ (map (
         instance:
-          let
-            iniContent = lib.generators.toINI { } instance.caves.ini;
-            iniPath = writeDstFile "Caves-server.ini" iniContent;
-          in
-          "L ${cfg.dataDir}/${instance.name}/Caves/server.ini - - - - ${iniPath}"
+        let
+          iniContent = lib.generators.toINI { } instance.caves.ini;
+          iniPath = writeDstFile "Caves-server.ini" iniContent;
+        in
+        "L ${cfg.dataDir}/${instance.name}/Caves/server.ini - - - - ${iniPath}"
       ) mappedInstances)
 
       # The lua override is a bit more of a trick.
       ++ (map (
         instance:
-          let
-            luaContent = luaGen.renderLuaFile instance.overrides.master;
-            luaPath = writeDstFile "Master-worldgenoverride.lua" luaContent;
-          in
-          "L ${cfg.dataDir}/${instance.name}/Master/worldgenoverride.lua - - - - ${luaPath}"
+        let
+          luaContent = luaGen.renderLuaFile instance.overrides.master;
+          luaPath = writeDstFile "Master-worldgenoverride.lua" luaContent;
+        in
+        "L ${cfg.dataDir}/${instance.name}/Master/worldgenoverride.lua - - - - ${luaPath}"
       ) mappedInstances)
       ++ (map (
         instance:
-          let
-            luaContent = luaGen.renderLuaFile instance.overrides.caves;
-            luaPath = writeDstFile "Caves-worldgenoverride.lua" luaContent;
-          in
-          "L ${cfg.dataDir}/${instance.name}/Caves/worldgenoverride.lua - - - - ${luaPath}"
+        let
+          luaContent = luaGen.renderLuaFile instance.overrides.caves;
+          luaPath = writeDstFile "Caves-worldgenoverride.lua" luaContent;
+        in
+        "L ${cfg.dataDir}/${instance.name}/Caves/worldgenoverride.lua - - - - ${luaPath}"
       ) mappedInstances);
   };
 }
