@@ -82,13 +82,27 @@ let
         };
 
         overrides.caves = mkOption {
-          type = types.attrsOf worldSettingsType.options.settings.type;
+          type = types.attrsof (
+            types.submodule (
+              { name, ... }:
+              {
+                options = types.attrsOf worldSettingsType.options.settings.type;
+              }
+            )
+          );
           default = { };
           description = "These worldgen overrides will be passed to the worldgenlua file";
         };
 
         overrides.master = mkOption {
-          type = types.attrsOf worldSettingsType.options.settings.type;
+          type = types.attrsOf (
+            types.submodule (
+              { name, ... }:
+              {
+                options = types.attrsOf worldSettingsType.options.settings.type;
+              }
+            )
+          );
           default = { };
           description = "These worldgen overrides will be passed to the worldgenlua file";
         };
