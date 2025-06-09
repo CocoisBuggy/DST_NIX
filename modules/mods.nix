@@ -49,7 +49,7 @@ in
   # lua as a little config language, NOT a programming languag
   makeModOverrides =
     mods:
-    lib.attrsets.foldAttrs (x: n: x // n) [ ] (
+    lib.attrsets.foldAttrs (x: n: x // n) { } (
       lib.attrsets.mapAttrsToList (id: value: { "[workshop-${id}]" = value; }) mods
     );
 
