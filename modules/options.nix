@@ -86,7 +86,7 @@ let
             types.submodule (
               { name, ... }:
               {
-                options = types.attrsOf worldSettingsType.options.settings.type;
+                options = worldSettingsType.options.settings.type;
               }
             )
           );
@@ -99,7 +99,7 @@ let
             types.submodule (
               { name, ... }:
               {
-                options = types.attrsOf worldSettingsType.options.settings.type;
+                options = worldSettingsType.options.settings.type;
               }
             )
           );
