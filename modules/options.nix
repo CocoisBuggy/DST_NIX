@@ -70,6 +70,8 @@ let
 
         mods = mkOption {
           type = types.listOf modOptions;
+          default = { };
+          description = "The mods specified here will be installed and setup according to the spec.";
         };
       };
     }
