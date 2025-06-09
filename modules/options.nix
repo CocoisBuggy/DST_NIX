@@ -6,7 +6,7 @@ let
   cfg = config.services.dstserver;
 
   # Define the structure for a single mod or entry
-  modOptions =
+  modOptions = types.submodule (
     { name, ... }:
     {
       options = {
@@ -27,7 +27,8 @@ let
           '';
         };
       };
-    };
+    }
+  );
 
   worldSettingsType = import ./worldgen.nix { inherit lib; };
 
@@ -87,7 +88,7 @@ let
         };
 
         overrides.master = mkOption {
-          type = types.attrsOf modOptions;
+          type = types.attrsOf types.attrsOf worldSettingsType.options.settings;
           default = { };
           description = "These worldgen overrides will be passed to the worldgenlua file";
         };
