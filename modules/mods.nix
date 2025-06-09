@@ -54,7 +54,7 @@ in
   makeSetup =
     instance:
     lib.strings.concatStringsSep "\n" (
-      builtins.mapAttrs (id: value: ''
+      lib.attrsets.mapAttrsToList (id: value: ''
         -- Mod: ${value.name}
         ServerModSetup("${value.workshopId}")
       '') instance.mods

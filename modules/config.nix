@@ -153,24 +153,24 @@ in
           luaPath = writeDstFile "Caves-worldgenoverride.lua" luaContent;
         in
         "L ${cfg.dataDir}/${instance.name}/Caves/worldgenoverride.lua - - - - ${luaPath}"
-      ) mappedInstances);
+      ) mappedInstances)
 
-    # # MODS
-    # ++ (map (
-    #   instance:
-    #   let
-    #     luaContent = luaGen.renderLuaFile (modConfig.makeModOverrides instance);
-    #     luaPath = writeDstFile "Mods-override.lua" luaContent;
-    #   in
-    #   "L ${cfg.dataDir}/${instance.name}/mods/modoverrides.lua - - - - ${luaPath}"
-    # ) mappedInstances)
-    # ++ (map (
-    #   instance:
-    #   let
-    #     luaContent = modConfig.makeSetup instance;
-    #     luaPath = writeDstFile "Mods-setup.lua" luaContent;
-    #   in
-    #   "L ${cfg.dataDir}/${instance.name}/mods/dedicated_server_mods_setup.lua - - - - ${luaPath}"
-    # ) mappedInstances);
+      # # MODS
+      # ++ (map (
+      #   instance:
+      #   let
+      #     luaContent = luaGen.renderLuaFile (modConfig.makeModOverrides instance);
+      #     luaPath = writeDstFile "Mods-override.lua" luaContent;
+      #   in
+      #   "L ${cfg.dataDir}/${instance.name}/mods/modoverrides.lua - - - - ${luaPath}"
+      # ) mappedInstances)
+      ++ (map (
+        instance:
+        let
+          luaContent = modConfig.makeSetup instance;
+          luaPath = writeDstFile "Mods-setup.lua" luaContent;
+        in
+        "L ${cfg.dataDir}/${instance.name}/mods/dedicated_server_mods_setup.lua - - - - ${luaPath}"
+      ) mappedInstances);
   };
 }
