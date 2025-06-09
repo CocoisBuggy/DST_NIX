@@ -159,7 +159,7 @@ in
       ++ (map (
         instance:
         let
-          luaContent = luaGen.renderLuaFile (modConfig.makeModOverrides instance);
+          luaContent = luaGen.renderLuaFile (modConfig.makeModOverrides instance.mods);
           luaPath = writeDstFile "Mods-override.lua" luaContent;
         in
         "L ${cfg.dataDir}/${instance.name}/mods/modoverrides.lua - - - - ${luaPath}"
