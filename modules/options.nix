@@ -5,31 +5,6 @@ with lib;
 let
   cfg = config.services.dstserver;
 
-  # Define the structure for a single mod or entry
-  modOptions = types.submodule (
-    { name, ... }:
-    {
-      options = {
-        enabled = mkOption {
-          type = types.bool;
-          default = true;
-          description = "Whether this mod/entry is enabled.";
-        };
-
-        # Use types.attrsOf types.unspecified or types.anything for flexible configuration_options
-        configuration_options = mkOption {
-          type = types.attrsOf types.unspecified; # Or types.attrs if you expect attributes
-          # type = types.anything; # Even more flexible, allows any Nix value
-          default = { };
-          description = ''
-            Arbitrary configuration options for this mod/entry.
-            This will be passed directly to the 'configuration_options' key.
-          '';
-        };
-      };
-    }
-  );
-
   worldSettingsType = import ./worldgen.nix { inherit lib; };
 
   # This is the definition for a single DST server instance

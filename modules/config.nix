@@ -6,6 +6,7 @@
 }: # Add pkgs to the function arguments
 let
   luaGen = import ./lua-generator.nix { inherit lib; };
+  modConfig = import ./mods.nix { inherit lib; };
   cfg = config.services.dstserver;
   inherit (lib) mkIf;
 
@@ -87,6 +88,9 @@ in
       ++ (map (
         instance: "d ${cfg.dataDir}/${instance.name}/Caves 0774 '${cfg.userName}' '${cfg.groupName}' -"
       ) cfg.instances)
+      ++ (map (
+        instance: "d ${cfg.dataDir}/${instance.name}/mods 0774 '${cfg.userName}' '${cfg.groupName}' -"
+      ) cfg.instances)
 
       # Use the 'L' (symlink) type to link to the generated file in the Nix store
       # Or 'f+' with a copy command if you really want a copy on disk
@@ -136,6 +140,7 @@ in
         in
         "L ${cfg.dataDir}/${instance.name}/Master/worldgenoverride.lua - - - - ${luaPath}"
       ) mappedInstances)
+
       ++ (map (
         instance:
         let
@@ -143,6 +148,24 @@ in
           luaPath = writeDstFile "Caves-worldgenoverride.lua" luaContent;
         in
         "L ${cfg.dataDir}/${instance.name}/Caves/worldgenoverride.lua - - - - ${luaPath}"
+      ) mappedInstances)
+
+      # MODS
+      ++ (map (
+        instance:
+        let
+          luaContent = luaGen.renderLuaFile (modConfig.makeModOverrides instance);
+          luaPath = writeDstFile "Mods-override.lua" luaContent;
+        in
+        "L ${cfg.dataDir}/${instance.name}/mods/modoverrides.lua - - - - ${luaPath}"
+      ) mappedInstances)
+      ++ (map (
+        instance:
+        let
+          luaContent = modConfig.makeSetup instance;
+          luaPath = writeDstFile "Mods-setup.lua" luaContent;
+        in
+        "L ${cfg.dataDir}/${instance.name}/mods/dedicated_server_mods_setup.lua - - - - ${luaPath}"
       ) mappedInstances);
   };
 }
