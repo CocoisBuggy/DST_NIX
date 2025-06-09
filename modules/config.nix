@@ -155,15 +155,15 @@ in
         "L ${cfg.dataDir}/${instance.name}/Caves/worldgenoverride.lua - - - - ${luaPath}"
       ) mappedInstances)
 
-      # # MODS
-      # ++ (map (
-      #   instance:
-      #   let
-      #     luaContent = luaGen.renderLuaFile (modConfig.makeModOverrides instance);
-      #     luaPath = writeDstFile "Mods-override.lua" luaContent;
-      #   in
-      #   "L ${cfg.dataDir}/${instance.name}/mods/modoverrides.lua - - - - ${luaPath}"
-      # ) mappedInstances)
+      # MODS
+      ++ (map (
+        instance:
+        let
+          luaContent = luaGen.renderLuaFile (modConfig.makeModOverrides instance);
+          luaPath = writeDstFile "Mods-override.lua" luaContent;
+        in
+        "L ${cfg.dataDir}/${instance.name}/mods/modoverrides.lua - - - - ${luaPath}"
+      ) mappedInstances)
       ++ (map (
         instance:
         let
