@@ -6,6 +6,7 @@ let
   cfg = config.services.dstserver;
 
   worldSettingsType = import ./worldgen.nix { inherit lib; };
+  mods = import ./mods.nix { inherit lib; };
 
   # This is the definition for a single DST server instance
   dstInstanceType = types.submodule (
@@ -68,7 +69,7 @@ let
         };
 
         mods = mkOption {
-          type = types.listOf modOptions;
+          type = types.attrsOf mods.modOptions;
           default = { };
           description = "The mods specified here will be installed and setup according to the spec.";
         };
