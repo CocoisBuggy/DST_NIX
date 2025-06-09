@@ -47,7 +47,7 @@ in
   # at this level we are not interested in the encoding, but we WILL try and help
   # the little luagen unit do its job by being cognizant of how we are treating
   # lua as a little config language, NOT a programming languag
-  makeModOverrides = instance: builtins.mapAttrs (id: value: { "[workshop-${id}]" = value; });
+  makeModOverrides = builtins.mapAttrs (id: value: { "[workshop-${id}]" = value; });
 
   # Make the simple lua setup (dedicated_server_mods_setup.lua)
   # e.g https://github.com/mathielo/dst-dedicated-server/blob/main/DSTClusterConfig/mods/dedicated_server_mods_setup-custom.lua
