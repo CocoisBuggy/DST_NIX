@@ -47,14 +47,14 @@ in
   # at this level we are not interested in the encoding, but we WILL try and help
   # the little luagen unit do its job by being cognizant of how we are treating
   # lua as a little config language, NOT a programming languag
-  makeModOverrides = instance: lib.attrSets.mapAttrs (id: value: { "[workshop-${id}]" = value; });
+  makeModOverrides = instance: builtins.mapAttrs (id: value: { "[workshop-${id}]" = value; });
 
   # Make the simple lua setup (dedicated_server_mods_setup.lua)
   # e.g https://github.com/mathielo/dst-dedicated-server/blob/main/DSTClusterConfig/mods/dedicated_server_mods_setup-custom.lua
   makeSetup =
     instance:
     lib.strings.concatStringsSep "\n" (
-      lib.attrsets.mapAttrs (id: value: ''
+      builtins.mapAttrs (id: value: ''
         -- Mod: ${value.name}
         ServerModSetup("${value.workshopId}")
       '') instance.mods
