@@ -11,7 +11,7 @@ let
   inherit (lib) mkIf;
 
   instanceConfig = instance: idx: {
-    inherit (instance) name cluster_token overrides;
+    inherit (instance) name cluster_token overrides, mods;
 
     master.ini = {
       NETWORK = {

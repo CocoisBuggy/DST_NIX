@@ -61,7 +61,6 @@ let
           default = { };
           description = "These worldgen overrides will be passed to the worldgenlua file";
         };
-
         overrides.master = mkOption {
           type = worldSettingsType.settings;
           default = { };
