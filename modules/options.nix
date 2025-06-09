@@ -95,14 +95,7 @@ let
         };
 
         overrides.master = mkOption {
-          type = types.attrsOf (
-            types.submodule (
-              { name, ... }:
-              {
-                options = worldSettingsType.options.settings.type;
-              }
-            )
-          );
+          type = types.attrsOf worldSettingsType.options.settings;
           default = { };
           description = "These worldgen overrides will be passed to the worldgenlua file";
         };
