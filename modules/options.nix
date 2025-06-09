@@ -6,13 +6,13 @@ let
   cfg = config.services.dstserver;
 
   # Define the structure for a single mod or entry
-  modOption =
+  modOptions =
     { name, ... }:
     {
       options = {
         enabled = mkOption {
           type = types.bool;
-          default = false;
+          default = true;
           description = "Whether this mod/entry is enabled.";
         };
 
@@ -28,6 +28,8 @@ let
         };
       };
     };
+
+  worldSettingsType = import ./worldgen.nix { inherit lib; };
 
   # This is the definition for a single DST server instance
   dstInstanceType = types.submodule (
@@ -79,15 +81,19 @@ let
         };
 
         overrides.caves = mkOption {
-          type = types.attrsOf types.anything;
+          type = types.attrsOf worldSettingsType.options.settings;
           default = { };
           description = "These worldgen overrides will be passed to the worldgenlua file";
         };
 
         overrides.master = mkOption {
-          type = types.attrsOf types.anything;
+          type = types.attrsOf modOptions;
           default = { };
           description = "These worldgen overrides will be passed to the worldgenlua file";
+        };
+
+        mods = mkOption {
+          type = types.listOf modOptions;
         };
       };
     }

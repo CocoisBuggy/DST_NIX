@@ -7,7 +7,6 @@
 let
   luaGen = import ./lua-generator.nix { inherit lib; };
   cfg = config.services.dstserver;
-
   inherit (lib) mkIf;
 
   instanceConfig = instance: idx: {
