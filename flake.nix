@@ -14,18 +14,8 @@
       system:
       let
         pkgs = import nixpkgs { inherit system; };
-        foreground = import ./tools/foreground.nix { inherit pkgs; };
       in
       {
-        packages.default = foreground;
-
-        apps.default = {
-          type = "app";
-          program = "${foreground}";
-        };
-      }
-    )
-    // {
       nixosModules.default = import ./modules/service.nix;
     };
 }

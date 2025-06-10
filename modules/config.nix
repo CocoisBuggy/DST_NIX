@@ -81,7 +81,7 @@ let
   );
 
   # New helper function to write content to a Nix store path
-  writeDstFile = filename: content: pkgs.writeText "${filename}-dst" content;
+  writeDstFile = instanceName: filename: content: pkgs.writeText "${instanceName}-${filename}" content;
 
 in
 {
@@ -103,7 +103,7 @@ in
         instance:
         let
           iniContent = lib.generators.toINI { } instance.cluster;
-          iniPath = writeDstFile "cluster.ini" iniContent;
+          iniPath = writeDstFile instance.name "cluster.ini" iniContent;
         in
         "L ${cfg.dataDir}/${instance.name}/cluster.ini - - - - ${iniPath}"
       ) mappedInstances
@@ -112,7 +112,7 @@ in
         instance:
         let
           tokenContent = lib.strings.trim instance.cluster_token;
-          tokenPath = writeDstFile "cluster_token.txt" tokenContent;
+          tokenPath = writeDstFile instance.name "cluster_token.txt" tokenContent;
         in
         "L ${cfg.dataDir}/${instance.name}/cluster_token.txt - - - - ${tokenPath}"
       ) mappedInstances)
@@ -122,7 +122,7 @@ in
         instance:
         let
           iniContent = lib.generators.toINI { } instance.master.ini;
-          iniPath = writeDstFile "Master-server.ini" iniContent;
+          iniPath = writeDstFile instance.name "Master-server.ini" iniContent;
         in
         "L ${cfg.dataDir}/${instance.name}/Master/server.ini - - - - ${iniPath}"
       ) mappedInstances)
@@ -131,7 +131,7 @@ in
         instance:
         let
           iniContent = lib.generators.toINI { } instance.caves.ini;
-          iniPath = writeDstFile "Caves-server.ini" iniContent;
+          iniPath = writeDstFile instance.name "Caves-server.ini" iniContent;
         in
         "L ${cfg.dataDir}/${instance.name}/Caves/server.ini - - - - ${iniPath}"
       ) mappedInstances)
@@ -141,7 +141,7 @@ in
         instance:
         let
           luaContent = luaGen.renderLuaFile instance.overrides.master;
-          luaPath = writeDstFile "Master-worldgenoverride.lua" luaContent;
+          luaPath = writeDstFile instance.name "Master-worldgenoverride.lua" luaContent;
         in
         "L ${cfg.dataDir}/${instance.name}/Master/worldgenoverride.lua - - - - ${luaPath}"
       ) mappedInstances)
@@ -150,7 +150,7 @@ in
         instance:
         let
           luaContent = luaGen.renderLuaFile instance.overrides.caves;
-          luaPath = writeDstFile "Caves-worldgenoverride.lua" luaContent;
+          luaPath = writeDstFile instance.name "Caves-worldgenoverride.lua" luaContent;
         in
         "L ${cfg.dataDir}/${instance.name}/Caves/worldgenoverride.lua - - - - ${luaPath}"
       ) mappedInstances)
@@ -160,7 +160,7 @@ in
         instance:
         let
           luaContent = luaGen.renderLuaFile (modConfig.makeModOverrides instance.mods);
-          luaPath = writeDstFile "Mods-override.lua" luaContent;
+          luaPath = writeDstFile instance.name "Mods-override.lua" luaContent;
         in
         "L ${cfg.dataDir}/${instance.name}/mods/modoverrides.lua - - - - ${luaPath}"
       ) mappedInstances)
@@ -168,7 +168,7 @@ in
         instance:
         let
           luaContent = modConfig.makeSetup instance;
-          luaPath = writeDstFile "Mods-setup.lua" luaContent;
+          luaPath = writeDstFile instance.name "Mods-setup.lua" luaContent;
         in
         "L ${cfg.dataDir}/${instance.name}/mods/dedicated_server_mods_setup.lua - - - - ${luaPath}"
       ) mappedInstances);

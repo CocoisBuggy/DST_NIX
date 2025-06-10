@@ -19,8 +19,16 @@ let
   renderLuaFile = value: ''
     return ${toLua value}
   '';
+
+  renderAndFormatLuaFile = { value, instanceName, filename }:
+    pkgs.runCommand "${instanceName}-${filename}" {
+      luaContent = renderLuaFile value;
+      nativeBuildInputs = [ pkgs.luaformatter ];
+    } ''
+      echo "$luaContent" | lua-format > $out
+    '';
 in
 {
   toLua = toLua;
-  renderLuaFile = renderLuaFile;
+  renderLuaFile = renderAndFormatLuaFile;
 }
