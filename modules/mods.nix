@@ -50,7 +50,9 @@ in
   makeModOverrides =
     mods:
     lib.attrsets.foldAttrs (x: n: x // n) { } (
-      lib.attrsets.mapAttrsToList (id: value: { "['workshop-${id}']" = { inherit (value) enabled configuration_options; }; }) mods
+      lib.attrsets.mapAttrsToList (id: value: {
+        "['workshop-${id}']" = { inherit (value) enabled configuration_options; };
+      }) mods
     );
 
   # Make the simple lua setup (dedicated_server_mods_setup.lua)

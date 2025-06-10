@@ -81,7 +81,9 @@ let
   );
 
   # New helper function to write content to a Nix store path
-  writeDstFile = instanceName: filename: content: pkgs.writeText "${instanceName}-${filename}" content;
+  writeDstFile =
+    instanceName: filename: content:
+    pkgs.writeText "${instanceName}-${filename}" content;
 
 in
 {
@@ -97,80 +99,134 @@ in
         instance: "d ${cfg.dataDir}/${instance.name}/mods 0774 '${cfg.userName}' '${cfg.groupName}' -"
       ) cfg.instances)
 
-      # Use the 'L' (symlink) type to link to the generated file in the Nix store
-      # Or 'f+' with a copy command if you really want a copy on disk
-      ++ map (
-        instance:
-        let
-          iniContent = lib.generators.toINI { } instance.cluster;
-          iniPath = writeDstFile instance.name "cluster.ini" iniContent;
-        in
-        "L ${cfg.dataDir}/${instance.name}/cluster.ini - - - - ${iniPath}"
-      ) mappedInstances
-      # every instance needs a reference to its cluster token
-      ++ (map (
-        instance:
-        let
-          tokenContent = lib.strings.trim instance.cluster_token;
-          tokenPath = writeDstFile instance.name "cluster_token.txt" tokenContent;
-        in
-        "L ${cfg.dataDir}/${instance.name}/cluster_token.txt - - - - ${tokenPath}"
-      ) mappedInstances)
+      # For each mapped instance, we now generate a list containing two rules:
+      # 1. 'r': Remove the symlink if it exists.
+      # 2. 'L': Create the new symlink.
+      # The lib.flatten will turn our list of lists into the single flat list that tmpfiles.rules expects.
+      ++ (lib.flatten (
+        map (
+          instance:
+          let
+            iniContent = lib.generators.toINI { } instance.cluster;
+            iniPath = writeDstFile instance.name "cluster.ini" iniContent;
+            targetPath = "${cfg.dataDir}/${instance.name}/cluster.ini";
+          in
+          [
+            "r ${targetPath}"
+            "L ${targetPath} - - - - ${iniPath}"
+          ]
+        ) mappedInstances
+      ))
+
+      ++ (lib.flatten (
+        map (
+          instance:
+          let
+            tokenContent = lib.strings.trim instance.cluster_token;
+            tokenPath = writeDstFile instance.name "cluster_token.txt" tokenContent;
+            targetPath = "${cfg.dataDir}/${instance.name}/cluster_token.txt";
+          in
+          [
+            "r ${targetPath}"
+            "L ${targetPath} - - - - ${tokenPath}"
+          ]
+        ) mappedInstances
+      ))
 
       # Master server.ini
-      ++ (map (
-        instance:
-        let
-          iniContent = lib.generators.toINI { } instance.master.ini;
-          iniPath = writeDstFile instance.name "Master-server.ini" iniContent;
-        in
-        "L ${cfg.dataDir}/${instance.name}/Master/server.ini - - - - ${iniPath}"
-      ) mappedInstances)
+      ++ (lib.flatten (
+        map (
+          instance:
+          let
+            iniContent = lib.generators.toINI { } instance.master.ini;
+            iniPath = writeDstFile instance.name "Master-server.ini" iniContent;
+            targetPath = "${cfg.dataDir}/${instance.name}/Master/server.ini";
+          in
+          [
+            "r ${targetPath}"
+            "L ${targetPath} - - - - ${iniPath}"
+          ]
+        ) mappedInstances
+      ))
+
       # Caves server.ini
-      ++ (map (
-        instance:
-        let
-          iniContent = lib.generators.toINI { } instance.caves.ini;
-          iniPath = writeDstFile instance.name "Caves-server.ini" iniContent;
-        in
-        "L ${cfg.dataDir}/${instance.name}/Caves/server.ini - - - - ${iniPath}"
-      ) mappedInstances)
+      ++ (lib.flatten (
+        map (
+          instance:
+          let
+            iniContent = lib.generators.toINI { } instance.caves.ini;
+            iniPath = writeDstFile instance.name "Caves-server.ini" iniContent;
+            targetPath = "${cfg.dataDir}/${instance.name}/Caves/server.ini";
+          in
+          [
+            "r ${targetPath}"
+            "L ${targetPath} - - - - ${iniPath}"
+          ]
+        ) mappedInstances
+      ))
 
-      # The lua override is a bit more of a trick.
-      ++ (map (
-        instance:
-        let
-          luaContent = luaGen.renderLuaFile instance.overrides.master;
-          luaPath = writeDstFile instance.name "Master-worldgenoverride.lua" luaContent;
-        in
-        "L ${cfg.dataDir}/${instance.name}/Master/worldgenoverride.lua - - - - ${luaPath}"
-      ) mappedInstances)
+      # Master worldgenoverride.lua
+      ++ (lib.flatten (
+        map (
+          instance:
+          let
+            luaContent = luaGen.renderLuaFile instance.overrides.master;
+            luaPath = writeDstFile instance.name "Master-worldgenoverride.lua" luaContent;
+            targetPath = "${cfg.dataDir}/${instance.name}/Master/worldgenoverride.lua";
+          in
+          [
+            "r ${targetPath}"
+            "L ${targetPath} - - - - ${luaPath}"
+          ]
+        ) mappedInstances
+      ))
 
-      ++ (map (
-        instance:
-        let
-          luaContent = luaGen.renderLuaFile instance.overrides.caves;
-          luaPath = writeDstFile instance.name "Caves-worldgenoverride.lua" luaContent;
-        in
-        "L ${cfg.dataDir}/${instance.name}/Caves/worldgenoverride.lua - - - - ${luaPath}"
-      ) mappedInstances)
+      # Caves worldgenoverride.lua
+      ++ (lib.flatten (
+        map (
+          instance:
+          let
+            luaContent = luaGen.renderLuaFile instance.overrides.caves;
+            luaPath = writeDstFile instance.name "Caves-worldgenoverride.lua" luaContent;
+            targetPath = "${cfg.dataDir}/${instance.name}/Caves/worldgenoverride.lua";
+          in
+          [
+            "r ${targetPath}"
+            "L ${targetPath} - - - - ${luaPath}"
+          ]
+        ) mappedInstances
+      ))
 
-      # MODS
-      ++ (map (
-        instance:
-        let
-          luaContent = luaGen.renderLuaFile (modConfig.makeModOverrides instance.mods);
-          luaPath = writeDstFile instance.name "Mods-override.lua" luaContent;
-        in
-        "L ${cfg.dataDir}/${instance.name}/mods/modoverrides.lua - - - - ${luaPath}"
-      ) mappedInstances)
-      ++ (map (
-        instance:
-        let
-          luaContent = modConfig.makeSetup instance;
-          luaPath = writeDstFile instance.name "Mods-setup.lua" luaContent;
-        in
-        "L ${cfg.dataDir}/${instance.name}/mods/dedicated_server_mods_setup.lua - - - - ${luaPath}"
-      ) mappedInstances);
+      # MODS override
+      ++ (lib.flatten (
+        map (
+          instance:
+          let
+            luaContent = luaGen.renderLuaFile (modConfig.makeModOverrides instance.mods);
+            luaPath = writeDstFile instance.name "Mods-override.lua" luaContent;
+            targetPath = "${cfg.dataDir}/${instance.name}/mods/modoverrides.lua";
+          in
+          [
+            "r ${targetPath}"
+            "L ${targetPath} - - - - ${luaPath}"
+          ]
+        ) mappedInstances
+      ))
+
+      # MODS setup
+      ++ (lib.flatten (
+        map (
+          instance:
+          let
+            luaContent = modConfig.makeSetup instance;
+            luaPath = writeDstFile instance.name "Mods-setup.lua" luaContent;
+            targetPath = "${cfg.dataDir}/${instance.name}/mods/dedicated_server_mods_setup.lua";
+          in
+          [
+            "r ${targetPath}"
+            "L ${targetPath} - - - - ${luaPath}"
+          ]
+        ) mappedInstances
+      ));
   };
 }
