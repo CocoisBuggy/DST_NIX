@@ -16,6 +16,10 @@
         pkgs = import nixpkgs { inherit system; };
       in
       {
+        # foreground-runnable package
+      }
+    )
+    // {
       nixosModules.default = import ./modules/service.nix;
     };
 }
