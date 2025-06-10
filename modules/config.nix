@@ -5,7 +5,7 @@
   ...
 }: # Add pkgs to the function arguments
 let
-  luaGen = import ./lua-generator.nix { inherit lib; };
+  luaGen = import ./lua-generator.nix { inherit lib pkgs; };
   modConfig = import ./mods.nix { inherit lib; };
   cfg = config.services.dstserver;
   inherit (lib) mkIf;
