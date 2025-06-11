@@ -110,10 +110,10 @@ in
 
   config = mkIf (cfg.instances != [ ]) {
     users.users.${cfg.userName} = {
-      isSystemUser = true;
       group = cfg.groupName;
       home = cfg.dataDir;
       createHome = true;
+      isSystemUser = true;
     };
 
     users.groups.${cfg.groupName} = { };

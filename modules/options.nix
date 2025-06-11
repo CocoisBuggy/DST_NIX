@@ -91,7 +91,7 @@ in
     };
     dataDir = mkOption {
       type = types.path;
-      default = "/var/lib/dstserver";
+      default = "/home/${userName}";
       description = "Directory to store Don't Starve Together server data and user files.";
     };
     installDir = mkOption {
