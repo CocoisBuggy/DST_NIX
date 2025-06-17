@@ -48,8 +48,6 @@ let
         	fi
         }
 
-        mkdir -p "${instanceBaseDir}"
-
         check_for_file "${instanceBaseDir}/cluster.ini"
         check_for_file "${instanceBaseDir}/cluster_token.txt"
         check_for_file "${instanceBaseDir}/Master/server.ini"
