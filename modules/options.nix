@@ -91,7 +91,7 @@ in
     };
     dataDir = mkOption {
       type = types.path;
-      default = "/home/${userName}";
+      default = "/home/${cfg.userName}";
       description = "Directory to store Don't Starve Together server data and user files.";
     };
     installDir = mkOption {
