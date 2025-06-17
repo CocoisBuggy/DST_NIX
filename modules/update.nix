@@ -14,7 +14,7 @@ let
   # Shell script to install/update Don't Starve Together using steamcmd
   steamCmdScript = pkgs.writeShellScript "steamcmd-dst-update" ''
     set -euo pipefail # Exit on error, undefined variable, or pipe failure
-    export HOME="${cfg.dataDir}"
+    export HOME="/home/${cfg.userName}"
     mkdir -p "${cfg.installDir}"
     echo "Updating Don't Starve Together server in ${cfg.installDir}..."
     echo "Using HOME: $HOME"
@@ -29,6 +29,7 @@ let
 in
 {
   config = mkIf (cfg.instances != [ ]) {
+    # Ensure extant directories with correct ownership
     systemd.tmpfiles.rules = [
       "d '${cfg.dataDir}' 0774 '${cfg.userName}' '${cfg.groupName}' -"
       "d '${cfg.installDir}' 0774 '${cfg.userName}' '${cfg.groupName}' -"
