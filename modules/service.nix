@@ -48,8 +48,7 @@ let
         	fi
         }
 
-        # We need a place to live
-        mkdir -p ${instanceBaseDir}
+        mkdir -p "${instanceBaseDir}"
 
         check_for_file "${instanceBaseDir}/cluster.ini"
         check_for_file "${instanceBaseDir}/cluster_token.txt"
@@ -93,7 +92,6 @@ let
           ExecStart = "${pkgs.steam-run}/bin/steam-run ${entrypoint}";
           User = "dstserver";
           Group = "dstserver";
-          # WorkingDirectory = instanceBaseDir;
           Restart = "on-failure";
         };
       };
