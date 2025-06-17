@@ -54,7 +54,6 @@ in
         User = cfg.userName;
         Group = cfg.groupName;
         ExecStart = "${steamCmdScript}";
-        WorkingDirectory = cfg.dataDir;
         StandardOutput = "journal";
         StandardError = "journal";
       };
