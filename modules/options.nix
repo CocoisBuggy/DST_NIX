@@ -91,12 +91,12 @@ in
     };
     dataDir = mkOption {
       type = types.path;
-      default = "/home/${cfg.userName}";
+      default = "/home/${cfg.userName}/.klei/DoNotStarveTogether";
       description = "Directory to store Don't Starve Together server data and user files.";
     };
     installDir = mkOption {
       type = types.path;
-      default = "${cfg.dataDir}/DST_Server";
+      default = "/home/${cfg.userName}/server_dst";
       description = "Absolute path for Don't Starve Together server installation via steamcmd.";
     };
     instances = mkOption {
