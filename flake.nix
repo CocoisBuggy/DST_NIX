@@ -16,7 +16,6 @@
         pkgs = import nixpkgs { inherit system; };
       in
       {
-        # foreground-runnable package
       }
     )
     // {
