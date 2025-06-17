@@ -48,7 +48,8 @@ let
         	fi
         }
 
-        echo $LD_LIBRARY_PATH
+        # We need a place to live
+        mkdir -p ${instanceBaseDir}
 
         check_for_file "${instanceBaseDir}/cluster.ini"
         check_for_file "${instanceBaseDir}/cluster_token.txt"
