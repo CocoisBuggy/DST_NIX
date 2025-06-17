@@ -109,6 +109,7 @@ in
   config = mkIf (cfg.instances != [ ]) {
     users.users.${cfg.userName} = {
       group = cfg.groupName;
+      home = "/home/${cfg.userName}";
       createHome = true;
       isSystemUser = true;
     };
