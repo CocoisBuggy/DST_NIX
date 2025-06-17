@@ -61,8 +61,6 @@ let
         cd "${installDir}/bin64" || fail
 
         run_shared=(./dontstarve_dedicated_server_nullrenderer_x64)
-        run_shared+=(-persistent_storage_root "${cfg.dataDir}")
-        run_shared+=(-conf_dir "")
         run_shared+=(-cluster ${cluster_name})
         run_shared+=(-monitor_parent_process $$)
 
@@ -111,7 +109,6 @@ in
   config = mkIf (cfg.instances != [ ]) {
     users.users.${cfg.userName} = {
       group = cfg.groupName;
-      home = cfg.dataDir;
       createHome = true;
       isSystemUser = true;
     };
